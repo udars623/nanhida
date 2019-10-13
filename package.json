@@ -1,0 +1,19 @@
+{
+  "name": "nanto-naku-hidan-1012",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html"
+  },
+  "dependencies": {
+    "moment": "2.24.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.2.0",
+    "cssnano": "^4.1.10",
+    "parcel-bundler": "^1.6.1"
+  },
+  "keywords": []
+}

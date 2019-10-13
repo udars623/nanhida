@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>なんとなく被弾したら一撃で殺されてしまった件について</title>
+        <meta charset="UTF-8" />
+        <style>
+            #gameScreen {
+                border: 1px solid black;
+                touch-action: manipulation;
+            }
+
+            img {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <img id="img_kenshi" src="assets/images/units/kenshi_tr.png" />
+        <img id="img_kenshi2" src="assets/images/units/kenshi2_tr.png" />
+        <img id="img_effect_EP" src="assets/images/effects/effectEP.png" />
+        <img id="img_effect_PP" src="assets/images/effects/effectPP.png" />
+        <img id="img_terrain_yama" src="assets/images/terrains/yama.png" />
+        <img id="img_terrain_kawa" src="assets/images/terrains/kawa.png" />
+        <img id="img_terrain_grass" src="assets/images/terrains/grass.png" />
+
+        <canvas id="gameScreen" width="360" height="640"></canvas>
+
+        <script src="src/index.js"></script>
+        <div>
+            Author: Udars/湯田酢 (<a href="https://twitter.com/udars_feh"
+                >@udars_feh</a
+            >).
+        </div>
+    </body>
+</html>
