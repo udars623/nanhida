@@ -5,13 +5,23 @@
         <meta charset="UTF-8" />
         <style>
             #gameScreen {
-                border: 1px solid black;
+                border: none;
                 touch-action: manipulation;
             }
 
             img {
                 display: none;
             }
+			
+			.noselect {
+			  -webkit-touch-callout: none; /* iOS Safari */
+				-webkit-user-select: none; /* Safari */
+				 -khtml-user-select: none; /* Konqueror HTML */
+				   -moz-user-select: none; /* Old versions of Firefox */
+					-ms-user-select: none; /* Internet Explorer/Edge */
+						user-select: none; /* Non-prefixed version, currently
+											  supported by Chrome, Opera and Firefox */
+			}
         </style>
     </head>
 
@@ -23,12 +33,14 @@
         <img id="img_terrain_yama" src="assets/images/terrains/yama.png" />
         <img id="img_terrain_kawa" src="assets/images/terrains/kawa.png" />
         <img id="img_terrain_grass" src="assets/images/terrains/grass.png" />
+		<img id="img_button_wait" src="assets/images/buttons/wait.png" />
+		<img id="img_button_turn_end" src="assets/images/buttons/turn_end.png" />
 
-        <canvas id="gameScreen" width="360" height="640"></canvas>
+        <canvas id="gameScreen" width="430" height="640"></canvas>
 
         <script src="src/index.js"></script>
-        <div>
-            Created by Udars/湯田酢 (<a href="https://twitter.com/udars_feh"
+        <div class="noselect">
+            Author: Udars/湯田酢 (<a href="https://twitter.com/udars_feh"
                 >@udars_feh</a
             >).
         </div>

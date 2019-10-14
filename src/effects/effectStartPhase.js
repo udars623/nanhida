@@ -5,7 +5,7 @@ export default class effectStartPhase {
         this.isEnemyPhase = isEnemyPhase;
         if (isEnemyPhase) this.image = document.getElementById("img_effect_EP");
         else this.image = document.getElementById("img_effect_PP");
-        this.drawX = hGame.gameWidth;
+        this.drawX = hGame.gameWidth + hGame.gridSize + 20;
         this.drawY =
             (hGame.gridSize * hGame.maxGrid.y) / 2 - this.image.height / 2;
         this.hGame = hGame;

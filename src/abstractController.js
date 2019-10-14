@@ -4,16 +4,26 @@ const CTRL_STATE_NONE = 0; // no player unit selected (can have enemy unit selec
 const CTRL_STATE_SELECTED = 1; // player unit selected
 const CTRL_STATE_DEST_CHOSEN = 2; // move pos selected
 const CTRL_STATE_TARGET_CHOSEN = 3; // attack target selected, one more click to execute
+//const CTRL_STATE_BUTTON = 4; // clicked some button.
 
-// this shit will be used by both player and AI
+
+// this stuff will be used by both player and AI
 // AI use it by faking clicks. It'll be a longer seq of codes for AI scripts but it will make sure consistency.
 // under such framework, AI should never call unit's event methods.
+
+// The main reason we have this stuff is because I wrongly 
+// made it possible for controllers to change unit states directly.
+// The more proper way to do this is that the controller tells the game
+// and then the game changes unit states.
+
+// but yeah now I think this stuff might be good for making replays consistent.
 
 export default class AbstractController {
     constructor(game, isEnemy) {
         this.hGame = game;
         this.isEnemy = isEnemy;
         this.ctrlState = CTRL_STATE_NONE;
+		this.currentButtonID = null;
         this.currentUnit = null;
         this.currentDest = null;
         this.currentTarget = null;
@@ -22,6 +32,10 @@ export default class AbstractController {
     stateDeselect() {
         this.currentUnit.eventDeselect();
         this.currentUnit = null;
+		if (this.currentTarget !== null) {
+			this.currentTarget.eventStopBeingTargeted();
+			this.currentTarget = null;
+		}
         this.ctrlState = CTRL_STATE_NONE;
     }
 
@@ -30,6 +44,10 @@ export default class AbstractController {
         this.ctrlState = CTRL_STATE_DEST_CHOSEN;
         this.currentUnit.eventProposeDestination(gp);
     }
+	
+	stateClearButton() {
+		this.currentButtonID = null;
+	}
 
     stateConfirmTarget(unit) {
         this.ctrlState = CTRL_STATE_TARGET_CHOSEN;
@@ -40,15 +58,47 @@ export default class AbstractController {
 
     clickButton(buttonID) {
         if (buttonID === consts.buttons.TurnEnd) {
-            // do something
+            if (this.ctrlState === CTRL_STATE_NONE 
+				|| this.ctrlState === CTRL_STATE_SELECTED) 
+			{
+				if (this.currentButtonID === null) {
+					// first time clicked
+					this.currentButtonID = buttonID;
+					if (this.currentUnit !== null) this.stateDeselect();
+					return true;
+				} else if (this.currentButtonID === consts.buttons.TurnEnd) {
+					// second time: execute
+					this.hGame.eventButtonTurnEnd();
+					this.stateClearButton();
+					return true;
+				} else {
+					// wrong button
+					this.stateClearButton();
+					return false;
+				}
+			} else {
+				this.stateClearButton();
+			}
         } else if (buttonID === consts.buttons.Wait) {
-            if (this.ctrlState === CTRL_STATE_NONE) {
-                return false;
-            } else {
-                this.currentUnit.eventExecuteWait();
-                this.stateDeselect();
-                return true;
-            }
+            if (this.ctrlState === CTRL_STATE_SELECTED) {
+				if (this.currentButtonID === null) {
+					// first time clicked
+					this.currentButtonID = buttonID;
+					return true;
+				} else if (this.currentButtonID === consts.buttons.Wait) {
+					// second time: execute
+					this.currentUnit.eventExecuteWait();
+					this.stateDeselect();
+					this.stateClearButton();
+					return true;
+				} else {
+					// wrong button
+					this.stateClearButton();
+					return false;
+				}
+			} else {
+				this.stateClearButton();
+			}
         }
         return false;
     }
@@ -63,6 +113,8 @@ export default class AbstractController {
             //localAlert("the selected position is out of bound");
             return false;
         }
+		
+		this.stateClearButton();
 
         if (this.ctrlState === CTRL_STATE_NONE) {
             // no player unit selected before, check which unit to select now
@@ -148,12 +200,12 @@ export default class AbstractController {
             ) {
                 // execute attack
                 this.currentUnit.eventExecuteAttack(this.currentTarget);
-                this.currentTarget.eventStopBeingTargeted();
+                //this.currentTarget.eventStopBeingTargeted();
                 this.stateDeselect();
                 return true;
             } else {
                 // not the same gridpos as proposed target, forfeit
-                this.currentTarget.eventStopBeingTargeted();
+                //this.currentTarget.eventStopBeingTargeted();
                 this.stateDeselect();
                 return false;
             }

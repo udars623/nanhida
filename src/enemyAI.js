@@ -27,6 +27,7 @@ export default class EnemyAI {
     executeWait(unit) {
         this.absCon.clickGP(unit.gridPos);
         this.absCon.clickButton(consts.buttons.Wait);
+		this.absCon.clickButton(consts.buttons.Wait);
         this.blockFrameRemain = this.blockFramePerWait;
     }
 

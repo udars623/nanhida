@@ -5,6 +5,7 @@ import EnemyAI from "/src/enemyAI";
 import PathFinder from "/src/pathFinder";
 import Stage01 from "/src/stages/stage01";
 import consts from "/src/consts";
+import Button from "/src/button";
 
 export default class Game {
     constructor(gameWidth, gameHeight, canvas) {
@@ -38,7 +39,19 @@ export default class Game {
         this.pathFinder = new PathFinder(this);
 
         this.gameResult = consts.gameResult.None;
+		
+		this.buttonList = [];
+		this.makeButtons();
     }
+	
+	makeButtons() {
+		this.buttonList.push(new Button(
+			this, "img_button_wait", consts.buttons.Wait, {x:7, y:1}
+		));
+		this.buttonList.push(new Button(
+			this, "img_button_turn_end", consts.buttons.TurnEnd, {x:7, y:2}
+		));
+	}
 
     bindPlayerInputHandler(inputHandler) {
         this.playerInputHandler = inputHandler;
@@ -74,6 +87,16 @@ export default class Game {
             this.enemyUnitList.forEach(object => object.eventSenjoUpdated());
         }
     }
+
+	eventButtonTurnEnd() {
+		let list = (this.currentPhase === this.PHASE_PLAYER) ? 
+			this.playerUnitList : this.enemyUnitList;
+		
+		list.forEach(unit => {
+			if (unit.isActive()) unit.eventExecuteWait();
+		});
+
+	}
 
     playerPhase() {
         //alert("Player Phase");
@@ -160,6 +183,17 @@ export default class Game {
         return null;
     }
 
+	findButton(pos) {
+		let result = null;
+		this.buttonList.forEach(button => {
+			if (button.checkClick(pos)) {
+				result = button.buttonID;
+				button.eventClick();
+			}
+		});
+		return result;
+	}
+
     mouseClick(pos) {
         // do nothing
     }
@@ -184,18 +218,23 @@ export default class Game {
     }
 
     update(df) {
+		this.buttonList.forEach(object => object.update(df));
+		
         if (this.framesBeforeChangePhase > 0) this.procChangePhase(df);
         if (this.currentPhase === this.PHASE_ENEMY) this.enemyAI.update(df);
         this.playerInputHandler.update(df);
 
         this.playerUnitList.forEach(object => object.update(df));
         this.enemyUnitList.forEach(object => object.update(df));
+		
         this.effectList.forEach(object => object.update(df));
     }
 
     draw(ctx) {
         this.stage.draw(ctx);
+		this.buttonList.forEach(object => object.draw(ctx));
         this.grid.draw(ctx);
+		
         this.playerUnitList.forEach(object => object.drawUnitBG(ctx));
         this.enemyUnitList.forEach(object => object.drawUnitBG(ctx));
         this.playerUnitList.forEach(object => object.drawUnit(ctx));

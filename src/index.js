@@ -7,6 +7,8 @@ let ctx = canvas.getContext("2d");
 
 const GAME_WIDTH = 360;
 const GAME_HEIGHT = 640;
+const DRAW_WIDTH = 430;
+const DRAW_HEIGHT = 640;
 
 //let paddle = new Paddle(GAME_WIDTH, GAME_HEIGHT);
 
@@ -22,7 +24,7 @@ function gameLoop(timestamp) {
     lastTime = timestamp;
     let df = dt / 16; // assume 16 ms per frame
 
-    ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    ctx.clearRect(0, 0, DRAW_WIDTH, DRAW_HEIGHT);
     game.update(df);
     game.draw(ctx);
 

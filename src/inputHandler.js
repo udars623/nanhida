@@ -54,9 +54,12 @@ export default class InputHandler {
     update(df) {
         while (df > 0 && this.clickPosQueue.length > 0) {
             df--;
-            this.abstractController.clickGP(
-                this.hGame.posToGridPos(this.clickPosQueue.shift())
-            );
+			let pos = this.clickPosQueue.shift();
+			if (pos.x <= this.hGame.gameWidth && pos.y <= this.hGame.gameHeight) {
+				this.abstractController.clickGP(this.hGame.posToGridPos(pos));
+			} else {
+				this.abstractController.clickButton(this.hGame.findButton(pos));
+			}
         }
     }
 }
