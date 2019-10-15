@@ -1,12 +1,17 @@
 import AbstractController from "/src/abstractController";
 import consts from "/src/consts";
 
-const dx = [0, -1, +1, 0];
-const dy = [+1, 0, 0, -1];
+// remember to check 1~maxGrid when using this stuff
+const d1 = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
+const d2 = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
+			{x:+2, y:0}, {x:-1, y:-1}, {x:+1, y:-1}, {x:0, y:-2}];
+const MAX_DIST = 100000;
 
 export default class EnemyAI {
     constructor(hGame, isEnemy) {
         this.hGame = hGame;
+		this.maxGrid = this.hGame.maxGrid;
+		
         this.isEnemy = isEnemy;
         if (this.isEnemy) {
             this.suList = hGame.enemyUnitList;
@@ -39,13 +44,11 @@ export default class EnemyAI {
     }
 
     executeMoveAttack(unit, dest, target) {
-        //alert(unit.gridPos + ", " + dest.gridPos + ", " + target.gridPos);
+        //alert(unit.gridPos.x + ", " + unit.gridPos.y + " @ " + dest.x + ", " + dest.y + " vs "+ target.gridPos.x + ", " + target.gridPos.y);
         this.absCon.clickGP(unit.gridPos);
         if (dest.x === unit.gridPos.x && dest.y === unit.gridPos.y) {
             this.absCon.clickGP(target.gridPos);
-            //alert("123");
             this.absCon.clickGP(target.gridPos);
-            //alert("123");
         } else {
             this.absCon.clickGP(dest);
             this.absCon.clickGP(target.gridPos);
@@ -53,24 +56,52 @@ export default class EnemyAI {
         }
         this.blockFrameRemain = this.blockFramePerAttack;
     }
+	
+	checkIfGpInMaxGrid(x, y) {
+		if (x < 1 || y < 1 || x > this.maxGrid.x || y > this.maxGrid.y) return false;
+		return true;
+	}
+
+	findBestAttackPosition(su, target) {
+		let dAttacks = (su.attackRange === 1) ? d1 : d2;
+		
+		let minDist = MAX_DIST;
+		let bestGP = null;
+		dAttacks.forEach(dgp => {
+			if (this.checkIfGpInMaxGrid(target.gridPos.x + dgp.x, target.gridPos.y + dgp.y) &&
+				su.pathData.dist[target.gridPos.x + dgp.x][target.gridPos.y + dgp.y] < minDist
+			) {
+				minDist = su.pathData.dist[target.gridPos.x + dgp.x][target.gridPos.y + dgp.y];
+				bestGP = {x : target.gridPos.x+dgp.x,  y : target.gridPos.y+dgp.y};
+			}
+		});
+		
+		//alert("/findBestAttackPosition " + su.unitID + "," + target.unitID +" @(" + bestGP.x +","+bestGP.y + ")");
+		
+		return bestGP;
+	}
 
     findOppoUnitAndAttack(suIdx) {
         let su = this.suList[suIdx];
-
-        su.pathData.listPossibleDest.forEach(gp => {
-            for (let i = 0; i < 4; i++) {
-                let target = this.hGame.findOppoUnitByGridPos(this.isEnemy, {
-                    x: gp.x + dx[i],
-                    y: gp.y + dy[i]
-                });
-                if (target !== null) {
-                    //alert("found target");
-                    this.executeMoveAttack(su, gp, target);
-                    return true;
-                }
+		let flagDone = false;
+		
+        su.pathData.listAttackable.forEach(gp => {
+			if (flagDone) return;
+			let target = this.hGame.findOppoUnitByGridPos(this.isEnemy, gp);
+			if (target !== null) {
+				//alert("found target");
+				this.executeMoveAttack(
+					su, 
+					this.findBestAttackPosition(su, target), 
+					target
+				);
+				flagDone = true;
+				return; // you can't just return true here because it's inside a anonymous func
+						// and you can't assume fOUAA ends here because it's inside a forEach loop!
+						// the moral is: old for loop RULES
             }
         });
-        return false;
+        return flagDone;
     }
 
     tryGetClose(suIdx) {
@@ -111,6 +142,7 @@ export default class EnemyAI {
                 let res = this.findOppoUnitAndAttack(i);
                 if (res === false) res = this.tryGetClose(i);
                 if (res === false) this.executeWait(this.suList[i]);
+				
                 return;
             }
         }

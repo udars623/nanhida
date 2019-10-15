@@ -1,5 +1,6 @@
 import InputHandler from "/src/inputHandler";
 import Game from "/src/game";
+import MapSelecter from "/src/mapSelecter";
 import consts from "/src/consts";
 
 let canvas = document.getElementById("gameScreen");
@@ -16,7 +17,9 @@ let game = new Game(GAME_WIDTH, GAME_HEIGHT, canvas);
 let playerInputHandler = new InputHandler(game);
 game.bindPlayerInputHandler(playerInputHandler);
 
-game.start();
+let mapSelecter = new MapSelecter(game);
+
+game.start("01");
 
 let lastTime = 0;
 function gameLoop(timestamp) {
@@ -28,10 +31,7 @@ function gameLoop(timestamp) {
     game.update(df);
     game.draw(ctx);
 
-    if (game.gameResult === consts.gameResult.None) {
-        requestAnimationFrame(gameLoop);
-    } else if (game.gameResult === consts.gameResult.Win) alert("You win!");
-    else if (game.gameResult === consts.gameResult.Lose) alert("GAME OVER");
+	requestAnimationFrame(gameLoop);
 }
 
 requestAnimationFrame(gameLoop);

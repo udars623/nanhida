@@ -12,7 +12,8 @@ const consts = {
     gameResult: {
         None: 0,
         Win: 1,
-        Lose: 2
+        Lose: 2,
+		GameEnded: 3
     }
 };
 export default consts;

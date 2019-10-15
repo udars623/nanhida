@@ -31,4 +31,6 @@ let unitList = [
     }
 ];
 
-export default new Stage(maxGrid, terrainMap, unitList);
+export default function createStage()	{
+	return new Stage(maxGrid, terrainMap, unitList);
+}

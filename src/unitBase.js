@@ -24,9 +24,10 @@ export default class UnitBase {
         this.stamina = 0;
         this.staminaMax = 1;
 
-        this.moveDist = 0;
         this.moveDistMax = 2;
         this.attackRange = 1;
+		
+		this.moveDist = this.moveDistMax;
 
         this.pathData = null;
 
@@ -62,12 +63,10 @@ export default class UnitBase {
 
         // reset buffs & debuffs?
         this.moveDist = this.moveDistMax;
-
-        // update path stuffs
-        this.updatePathData();
     }
 
-    eventSenjoUpdated() {
+	// super important stuff
+    eventRequirePathUpdate() {
         this.updatePathData();
     }
 
@@ -206,6 +205,33 @@ export default class UnitBase {
     }
 
     update(df) {}
+	
+	drawThreat(ctx) {
+		if (this.isSelected) {
+			ctx.fillStyle = "rgba(255,238,238,0.8)";
+			this.pathData.listAttackable.forEach(gp => {
+				if (!this.hGame.pathFinder.isReachable(this.pathData, gp)) {
+					let pos = this.hGame.gridPosToPos(gp);
+					ctx.fillRect(
+						pos.x - this.imageSize.x * 0.45,
+						pos.y - this.imageSize.y * 0.45,
+						this.imageSize.x * 0.9,
+						this.imageSize.y * 0.9
+					);
+				}
+			});
+			ctx.fillStyle = "rgba(238,238,255,0.5)";
+			this.pathData.listPossibleDest.forEach(gp => {
+				let pos = this.hGame.gridPosToPos(gp);
+				ctx.fillRect(
+					pos.x - this.imageSize.x * 0.45,
+					pos.y - this.imageSize.y * 0.45,
+					this.imageSize.x * 0.9,
+					this.imageSize.y * 0.9
+				);
+			});
+		}
+	}
 
     drawUnitBG(ctx) {
         if (this.isSelected || this.isTargeted) {

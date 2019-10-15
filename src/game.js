@@ -3,6 +3,7 @@ import Grid from "/src/grid";
 import EffectStartPhase from "/src/effects/effectStartPhase";
 import EnemyAI from "/src/enemyAI";
 import PathFinder from "/src/pathFinder";
+import Stage00 from "/src/stages/stage00";
 import Stage01 from "/src/stages/stage01";
 import consts from "/src/consts";
 import Button from "/src/button";
@@ -21,7 +22,14 @@ export default class Game {
 
         this.gridSize = gameWidth / this.maxGrid.x;
         this.grid = new Grid(this.gridSize, this.maxGrid);
-
+	
+		this.buttonList = [];
+		this.makeButtons();
+		
+		this.resetGameState()
+    }
+	
+	resetGameState() {
         this.playerUnitList = [];
         this.enemyUnitList = [];
         this.unitID = 0;
@@ -38,11 +46,8 @@ export default class Game {
         this.enemyAI = new EnemyAI(this, true);
         this.pathFinder = new PathFinder(this);
 
-        this.gameResult = consts.gameResult.None;
-		
-		this.buttonList = [];
-		this.makeButtons();
-    }
+        this.gameResult = consts.gameResult.None;	
+	}
 	
 	makeButtons() {
 		this.buttonList.push(new Button(
@@ -69,23 +74,31 @@ export default class Game {
             );
     }
 
-    start() {
-        this.stage = Stage01;
+    start(stageIdxStr) {
+		//alert("start")
+		this.resetGameState();
+		
+		if (stageIdxStr === "00") this.stage = Stage00();
+		if (stageIdxStr === "01") this.stage = Stage01();
+				
         this.stage.initStage(this);
-
+		
         this.playerPhase();
+		this.requirePathUpdate();
     }
+
+	requirePathUpdate() {
+		this.playerUnitList.forEach(object => object.eventRequirePathUpdate());
+        this.enemyUnitList.forEach(object => object.eventRequirePathUpdate());
+	}
 
     eventActionExecuted() {
         this.totalActiveStamina--;
         if (this.totalActiveStamina <= 0) {
             this.endPhase();
         }
-        if (this.currentPhase === this.PHASE_PLAYER) {
-            this.playerUnitList.forEach(object => object.eventSenjoUpdated());
-        } else if (this.currentPhase === this.PHASE_ENEMY) {
-            this.enemyUnitList.forEach(object => object.eventSenjoUpdated());
-        }
+        
+		this.requirePathUpdate();
     }
 
 	eventButtonTurnEnd() {
@@ -228,6 +241,16 @@ export default class Game {
         this.enemyUnitList.forEach(object => object.update(df));
 		
         this.effectList.forEach(object => object.update(df));
+		
+		if (this.gameResult === consts.gameResult.Win) {
+			alert("You win!");
+			this.gameResult = consts.gameResult.GameEnded;
+		}
+		if (this.gameResult === consts.gameResult.Lose) {
+			alert("GAME OVER");
+			this.gameResult = consts.gameResult.GameEnded;
+		}
+
     }
 
     draw(ctx) {
@@ -235,6 +258,8 @@ export default class Game {
 		this.buttonList.forEach(object => object.draw(ctx));
         this.grid.draw(ctx);
 		
+		this.playerUnitList.forEach(object => object.drawThreat(ctx));
+        this.enemyUnitList.forEach(object => object.drawThreat(ctx));
         this.playerUnitList.forEach(object => object.drawUnitBG(ctx));
         this.enemyUnitList.forEach(object => object.drawUnitBG(ctx));
         this.playerUnitList.forEach(object => object.drawUnit(ctx));
