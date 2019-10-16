@@ -34,4 +34,22 @@ function gameLoop(timestamp) {
 	requestAnimationFrame(gameLoop);
 }
 
+function scriptCollapsibles() {
+	// https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_collapsible
+	let collapsibles = document.getElementsByClassName("collapsible");
+	for (let i = 0; i < collapsibles.length; i++) {
+		collapsibles[i].addEventListener("click", function() {
+			this.classList.toggle("active");
+			let content = this.nextElementSibling; // wtf this is handy
+			if (content.style.display === "block") {
+				content.style.display = "none";
+			} else {
+				content.style.display = "block";
+			}
+		});
+	}
+}
+
+scriptCollapsibles() ;
+
 requestAnimationFrame(gameLoop);

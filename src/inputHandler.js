@@ -12,16 +12,16 @@ export default class InputHandler {
         this.isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent);
         let touchEvent = this.isMobile ? "touchstart" : "click";
 
-        document.addEventListener(touchEvent, event => {
+        this.hCanvas.addEventListener(touchEvent, event => {
             this.mouseClick(this.getMousePosWithinCanvas(event));
             if (this.isMobile) event.preventDefault();
         });
 
         if (this.isMobile) {
-            document.addEventListener("touchmove", event => {
+            this.hCanvas.addEventListener("touchmove", event => {
                 event.preventDefault();
             });
-            document.addEventListener("touchend", event => {
+            this.hCanvas.addEventListener("touchend", event => {
                 event.preventDefault();
             });
         }

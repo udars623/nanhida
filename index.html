@@ -22,6 +22,33 @@
 						user-select: none; /* Non-prefixed version, currently
 											  supported by Chrome, Opera and Firefox */
 			}
+			
+			.collapsible {
+				background-color: #777;
+				color: white;
+				cursor: pointer;
+				padding: 10px;
+				width: 200px;
+				border: none;
+				text-align: left;
+				outline: none;
+				font-size: 14px;
+			}
+			
+			.active, .collapsible:hover {
+				background-color: #555;
+			}
+
+			.collapsedContent {
+				padding: 0 18px;
+				display: none;
+				overflow: hidden;
+				background-color: #f1f1f1;
+			}
+			
+			.hided {
+				display: none;
+			}
         </style>
     </head>
 
@@ -38,12 +65,17 @@
 
         <canvas id="gameScreen" width="430" height="640"></canvas>
 
-        <div class="noselect">
+		<br />
+        <button type="button" class="collapsible">Menu</button>
+		<div class="collapsedContent">
+			<div id="mapSelecter">map selecter here</div>
+		</div>
+		<br />
+		<div class="noselect">
             Author: Udars/湯田酢 (<a href="https://twitter.com/udars_feh"
                 >@udars_feh</a
             >).
         </div>
-		<div class="noselect" id="mapSelecter">map selecter here</div>
 		
 		<script src="src/index.js"></script>
     </body>
