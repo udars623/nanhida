@@ -7,6 +7,7 @@ import consts from "/src/consts";
 import Button from "/src/button";
 import StageList from "/src/stages/stageList";
 import UnitCreator from "/src/units/unitCreator";
+import MoveAssistList from "/src/skills/moveAssistList";
 
 export default class Game {
     constructor(gameWidth, gameHeight, canvas) {
@@ -25,11 +26,12 @@ export default class Game {
 		
 		this.stageList = new StageList();
 		this.unitCreator = new UnitCreator();
+		this.moveAssistList = new MoveAssistList(this);
 	
 		this.buttonList = [];
 		this.makeButtons();
 		
-		this.resetGameState()
+		this.resetGameState();
     }
 	
 	resetGameState() {
@@ -39,7 +41,6 @@ export default class Game {
 
         this.effectList = [];
 
-        this.totalActiveStamina = 0;
         this.currentPhase = this.PHASE_NONE;
         this.isPhaseBlocked = false;
         this.framesBeforeChangePhase = 0;
@@ -96,9 +97,20 @@ export default class Game {
         this.enemyUnitList.forEach(object => object.eventRequirePathUpdate());
 	}
 
+	countActiveUnits() {
+		let count = 0;
+		let list = null;
+		if (this.currentPhase === this.PHASE_PLAYER) list = this.playerUnitList;
+		if (this.currentPhase === this.PHASE_ENEMY) list = this.enemyUnitList;
+		if (list === null) return 0;
+		list.forEach(unit => {
+			if (unit.isActive()) count ++;
+		});
+		return count;
+	}
+
     eventActionExecuted() {
-        this.totalActiveStamina--;
-        if (this.totalActiveStamina <= 0) {
+        if (this.countActiveUnits() === 0) {
             this.endPhase();
         }
         
@@ -119,20 +131,16 @@ export default class Game {
         //alert("Player Phase");
         this.turn++;
         this.currentPhase = this.PHASE_PLAYER;
-        this.totalActiveStamina = 0;
         this.playerUnitList.forEach(object => {
             object.eventNewTurn();
-            this.totalActiveStamina += object.stamina;
         });
     }
 
     enemyPhase() {
         //alert("Enemy Phase");
         this.currentPhase = this.PHASE_ENEMY;
-        this.totalActiveStamina = 0;
         this.enemyUnitList.forEach(object => {
             object.eventNewTurn();
-            this.totalActiveStamina += object.stamina;
         });
         //this.endPhase();
     }
@@ -233,6 +241,24 @@ export default class Game {
     eventEffectEnd(effect) {
         removeObjectFromList(effect, this.effectList);
     }
+
+	// called by abstractController, pass to this.moveAssistList
+	checkMoveAssist(user, dest, target) {
+		if (user.params === null || 
+			typeof(user.params.moveAssist) === "undefined" ||
+			user.params.moveAssist === null
+		) return false;
+		return this.moveAssistList.checkEligibility(user.params.moveAssist, user, dest, target);
+	}
+
+	// called by abstractController, pass to this.moveAssistList
+	eventExecuteMoveAssist(user, target) {
+		if (user.params === null || 
+			typeof(user.params.moveAssist) === "undefined" ||
+			user.params.moveAssist === null
+		) return false;
+		return this.moveAssistList.execute(user.params.moveAssist, user, target);
+	}
 
     update(df) {
 		this.buttonList.forEach(object => object.update(df));

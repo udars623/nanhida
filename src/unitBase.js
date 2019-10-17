@@ -20,7 +20,8 @@ export default class UnitBase {
 		this.staminaMax = 1;
 		this.moveDistMax = 2;
 		this.attackRange = 1;
-
+		this.params = null;
+		
         this.pathData = null;
     }
 	
@@ -89,21 +90,32 @@ export default class UnitBase {
         this.resetProposal();
     }
 
-    checkPassable(gridPos, flagIgnoreUnit = false) {
-        // movement types vs terrains, pass skill vs enemy etc.
-        if (
-            !flagIgnoreUnit &&
-            this.hGame.findOppoUnitByGridPos(this.isEnemy, gridPos) !== null
-        )
-            return false;
-
-        if (
-            this.hGame.stage.getTerrain(gridPos.x, gridPos.y) !==
+	checkTerrain(gridPos) {
+		if (this.hGame.stage.getTerrain(gridPos.x, gridPos.y) !==
             terrainTypes.Nrm
-        )
-            return false;
+        ) 	return false;
 
         return true;
+	}
+
+	// for MoveAssist.checkEligibility
+	checkStopable(gridPos, ignoreUnit) {
+		let unit = this.hGame.findUnitByGridPos(gridPos);
+		if (unit !== null && 
+			unit !== ignoreUnit &&
+			unit !== this
+		) return false;
+		
+		return this.checkTerrain(gridPos);
+	}
+
+    checkPassable(gridPos, flagIgnoreEnemyUnit = false) {
+        // movement types vs terrains, pass skill vs enemy etc.
+        if (!flagIgnoreEnemyUnit &&
+            this.hGame.findOppoUnitByGridPos(this.isEnemy, gridPos) !== null
+        )	return false;
+
+        return this.checkTerrain(gridPos);
     }
 
     checkMoveDestination(gridPos) {
@@ -120,7 +132,7 @@ export default class UnitBase {
         }
         return false;
     }
-
+	
     acceptPath(path) {
         this.pathToDestProposal = path;
         this.pathToDestProposalCoord = [path.length];
@@ -151,18 +163,29 @@ export default class UnitBase {
     }
 
     eventExecuteMovement() {
+		this.stamina = 1; // to make sure it becomes 0 after executeAction
         this.gridPos = this.destProposalGP;
         this.coordinate = this.hGame.gridPosToPos(this.gridPos);
         this.executeAction();
     }
+	
+	eventUseMoveAssist(gpNew) {
+		this.gridPos = gpNew;
+		this.coordinate = this.hGame.gridPosToPos(this.gridPos);
+		this.executeAction();
+	}
+	
+	eventMovedByMoveAssist(gpNew) {
+		this.gridPos = gpNew;
+		this.coordinate = this.hGame.gridPosToPos(this.gridPos);
+	}
 
     checkAttackTarget(unit, destProposalGP) {
-        if (
-            Math.abs(unit.gridPos.x - destProposalGP.x) +
-                Math.abs(unit.gridPos.y - destProposalGP.y) ===
+		if (this.attackRange === 0) return false;
+        if (Math.abs(unit.gridPos.x - destProposalGP.x) +
+            Math.abs(unit.gridPos.y - destProposalGP.y) ===
             this.attackRange
-        )
-            return true;
+        )	return true;
         return false;
     }
 

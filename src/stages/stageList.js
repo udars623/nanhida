@@ -1,6 +1,7 @@
 import Stage0 from "/src/stages/stage0";
 import Stage1 from "/src/stages/stage1";
 import Stage2 from "/src/stages/stage2";
+import Stage3 from "/src/stages/stage3";
 
 /*
 	When adding a new stage:
@@ -19,6 +20,7 @@ export default class StageList {
 		this.list[0] = Stage0;
 		this.list[1] = Stage1;
 		this.list[2] = Stage2;
+		this.list[3] = Stage3;
 	}
 	
 	loadStage(idxStr, hGame) {
@@ -34,8 +36,10 @@ export default class StageList {
 			<option value="0" selected>Stage 00</option>
 			<option value="1">Stage 01</option>
 			<option value="2">Stage 02</option>
+			<option value="3">Stage 03</option>
 		</select>
 		<button id="divSelecter_confirm">Confirm</button>
+		<br />
 		`;
 		return str;
 	}

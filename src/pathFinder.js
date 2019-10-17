@@ -1,7 +1,9 @@
 const dx = [0, -1, +1, 0];
 const dy = [+1, 0, 0, -1];
-const d1 = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
-const d2 = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
+let dAtk = [3];
+dAtk[0] = [];
+dAtk[1] = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
+dAtk[2] = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
 			{x:+2, y:0}, {x:-1, y:-1}, {x:+1, y:-1}, {x:0, y:-2}];
 const MAX_DIST = 100000;
 
@@ -22,9 +24,9 @@ export default class PathFinder {
         return an object pathData := {
 			prev[x][y] := (gp) gp of parent node in the path tree.
 			dist[x][y] := (int) dist from startGP.
-			listPossibleDest := [] of reachable gp.
+			listPossibleDest := [] of reachable gp. NOTE: MIGHT HAVE OTHER UNITS
 			attackable[x][y] := (bool) whether that gp can be attacked by the unit.
-			listAttackable := [] of attackable gp.
+			listAttackable := [] of attackable gp. NOTE: MIGHT BE BLOCKED BY OTHER UNITS
 		}
     */
     floodFill(unit, startGP, searchRange, flagIgnoreUnit = false) {
@@ -52,7 +54,7 @@ export default class PathFinder {
         listPossibleDest.push(startGP);
 		let listAttackable = [];
 		
-		let dAttacks = (unit.attackRange === 1) ? d1 : d2;
+		let dAttacks = dAtk[unit.attackRange];
 		this.addAttackable(dAttacks, attackable, listAttackable, startGP.x, startGP.y)
 
         while (head > tail) {

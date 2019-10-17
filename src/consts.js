@@ -22,8 +22,14 @@ const consts = {
 		pTomato: 2,
 		pBlueberry: 3,
 		pCabbage: 4,
+		pKenshiJinlai: 5,
 		
 		eKenshi: 11
+	},
+	moveAssist: {
+		reposition: 0,
+		drawBack: 1,
+		swap: 2
 	}
 };
 export default consts;

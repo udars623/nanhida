@@ -4,6 +4,8 @@ const CTRL_STATE_NONE = 0; // no player unit selected (can have enemy unit selec
 const CTRL_STATE_SELECTED = 1; // player unit selected
 const CTRL_STATE_DEST_CHOSEN = 2; // move pos selected
 const CTRL_STATE_TARGET_CHOSEN = 3; // attack target selected, one more click to execute
+const CTRL_STATE_MA_TARGET_CHOSEN = 4; // move assist target selected
+
 //const CTRL_STATE_BUTTON = 4; // clicked some button.
 
 
@@ -55,6 +57,12 @@ export default class AbstractController {
         this.currentUnit.eventProposeTarget(unit);
         unit.eventBeTargeted(); // this doesn't seem right here, should be in Game or at least another class
     }
+	
+	stateConfirmMATarget(unit) {
+        this.ctrlState = CTRL_STATE_MA_TARGET_CHOSEN;
+        this.currentTarget = unit;
+        unit.eventBeTargeted(); // this doesn't seem right here, should be in Game or at least another class
+	}
 
     clickButton(buttonID) {
         if (buttonID === consts.buttons.TurnEnd) {
@@ -104,13 +112,12 @@ export default class AbstractController {
     }
 
     clickGP(gp) {
-        if (
-            gp.x < 1 ||
+        if (gp.x < 1 ||
             gp.x > this.hGame.maxGrid.x ||
             gp.y < 1 ||
             gp.y > this.hGame.maxGrid.y
         ) {
-            //localAlert("the selected position is out of bound");
+			//localAlert("the selected position is out of bound");
             return false;
         }
 		
@@ -146,21 +153,32 @@ export default class AbstractController {
                 this.stateConfirmDestination(gp);
                 return true;
             } else {
-                if (
-                    unit !== null &&
+                if (unit !== null &&
                     unit.isEnemy !== this.isEnemy &&
                     this.currentUnit.checkAttackTarget(
                         unit,
                         this.currentUnit.gridPos
                     )
                 ) {
-                    localAlert(
+					localAlert(
                         "selected an eligible target during dest proposition"
                     );
                     this.stateConfirmDestination(this.currentUnit.gridPos);
                     this.stateConfirmTarget(unit);
                     return true;
-                } else {
+                } else if (unit !== null &&
+					unit.unitID !== this.currentUnit.unitID &&
+                    unit.isEnemy === this.isEnemy &&
+                    this.hGame.checkMoveAssist(
+						this.currentUnit, 
+						this.currentUnit.gridPos,
+						unit
+					)
+				) {	
+					this.stateConfirmDestination(this.currentUnit.gridPos);
+                    this.stateConfirmMATarget(unit);
+					return true;
+				} else {
                     localAlert("invalid destination");
                     this.stateDeselect();
                     return false;
@@ -169,43 +187,61 @@ export default class AbstractController {
         } else if (this.ctrlState === CTRL_STATE_DEST_CHOSEN) {
             // destination chosen, execute movement or find attack target.
             let unit = this.hGame.findUnitByGridPos(gp);
-            if (
-                unit === null &&
+            if (unit === null &&
                 gp.x === this.currentDest.x &&
                 gp.y === this.currentDest.y
             ) {
-                // execute movement
+				// execute movement
                 this.currentUnit.eventExecuteMovement(gp);
                 this.stateDeselect();
                 return true;
             } else {
-                if (
-                    unit !== null &&
+                if (unit !== null &&
                     unit.isEnemy !== this.isEnemy &&
                     this.currentUnit.checkAttackTarget(unit, this.currentDest)
-                ) {
-                    // target confirmed
+                ) {	// target confirmed
                     this.stateConfirmTarget(unit);
                     return true;
-                } else {
+                } else if (unit !== null &&
+					unit.unitID !== this.currentUnit.unitID &&
+                    unit.isEnemy === this.isEnemy &&
+                    this.hGame.checkMoveAssist(
+						this.currentUnit, 
+						this.currentDest,
+						unit
+					)
+				)  { // Move assist target confirmed
+                    this.stateConfirmMATarget(unit);
+                    return true;
+				} else {
                     // invalid target
                     this.stateDeselect();
                     return false;
                 }
             }
         } else if (this.ctrlState === CTRL_STATE_TARGET_CHOSEN) {
-            if (
-                gp.x === this.currentTarget.gridPos.x &&
+            if (gp.x === this.currentTarget.gridPos.x &&
                 gp.y === this.currentTarget.gridPos.y
             ) {
                 // execute attack
                 this.currentUnit.eventExecuteAttack(this.currentTarget);
-                //this.currentTarget.eventStopBeingTargeted();
                 this.stateDeselect();
                 return true;
             } else {
                 // not the same gridpos as proposed target, forfeit
-                //this.currentTarget.eventStopBeingTargeted();
+                this.stateDeselect();
+                return false;
+            }
+        } else if (this.ctrlState === CTRL_STATE_MA_TARGET_CHOSEN) {
+            if (gp.x === this.currentTarget.gridPos.x &&
+                gp.y === this.currentTarget.gridPos.y
+            ) {
+                // execute move assist
+				this.hGame.eventExecuteMoveAssist(this.currentUnit, this.currentTarget);
+                this.stateDeselect();
+                return true;
+            } else {
+                // not the same gridpos as proposed target, forfeit
                 this.stateDeselect();
                 return false;
             }

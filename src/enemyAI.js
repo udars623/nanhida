@@ -2,8 +2,10 @@ import AbstractController from "/src/abstractController";
 import consts from "/src/consts";
 
 // remember to check 1~maxGrid when using this stuff
-const d1 = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
-const d2 = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
+let dAtk = [3];
+dAtk[0] = [];
+dAtk[1] = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
+dAtk[2] = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
 			{x:+2, y:0}, {x:-1, y:-1}, {x:+1, y:-1}, {x:0, y:-2}];
 const MAX_DIST = 100000;
 
@@ -63,7 +65,7 @@ export default class EnemyAI {
 	}
 
 	findBestAttackPosition(su, target) {
-		let dAttacks = (su.attackRange === 1) ? d1 : d2;
+		let dAttacks = dAtk[su.attackRange];
 		
 		let minDist = MAX_DIST;
 		let bestGP = null;
