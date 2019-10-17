@@ -79,6 +79,10 @@ export default class Game {
 		list.push(newUnit);
 		newUnit.initAfterCreation();
     }
+	
+	startDefaultStage() {
+		this.start(this.stageList.defaultStageIdx);
+	}
 
     start(stageIdxStr) {
 		//alert("start")

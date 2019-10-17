@@ -16,6 +16,7 @@ import Stage3 from "/src/stages/stage3";
 export default class StageList {
 	constructor () {
 		this.list = [100];
+		this.defaultStageIdx = 3;
 		
 		this.list[0] = Stage0;
 		this.list[1] = Stage1;
@@ -33,10 +34,10 @@ export default class StageList {
 		let str = `
 		Map:
 		<select id="divSelecter_list">
-			<option value="0" selected>Stage 00</option>
+			<option value="0">Stage 00</option>
 			<option value="1">Stage 01</option>
 			<option value="2">Stage 02</option>
-			<option value="3">Stage 03</option>
+			<option value="3" selected>Stage 03</option>
 		</select>
 		<button id="divSelecter_confirm">Confirm</button>
 		<br />

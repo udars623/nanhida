@@ -210,6 +210,7 @@ export default class UnitBase {
     }
 
     eventExecuteWait() {
+		this.stamina = 1; // to make sure it becomes 0 after executeAction
         this.executeAction();
     }
 
