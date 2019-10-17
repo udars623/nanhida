@@ -14,6 +14,16 @@ const consts = {
         Win: 1,
         Lose: 2,
 		GameEnded: 3
-    }
+    },
+	unitTypes: {
+		unitBase: 0,
+		
+		pKenshi: 1,
+		pTomato: 2,
+		pBlueberry: 3,
+		pCabbage: 4,
+		
+		eKenshi: 11
+	}
 };
 export default consts;

@@ -71,8 +71,12 @@ export default class EnemyAI {
 			if (this.checkIfGpInMaxGrid(target.gridPos.x + dgp.x, target.gridPos.y + dgp.y) &&
 				su.pathData.dist[target.gridPos.x + dgp.x][target.gridPos.y + dgp.y] < minDist
 			) {
-				minDist = su.pathData.dist[target.gridPos.x + dgp.x][target.gridPos.y + dgp.y];
-				bestGP = {x : target.gridPos.x+dgp.x,  y : target.gridPos.y+dgp.y};
+				let newGP = {x : target.gridPos.x+dgp.x,  y : target.gridPos.y+dgp.y};
+				let unit = this.hGame.findUnitByGridPos(newGP);
+				if (unit === null || unit.unitID === su.unitID) {
+					minDist = su.pathData.dist[target.gridPos.x + dgp.x][target.gridPos.y + dgp.y];
+					bestGP = newGP;
+				}
 			}
 		});
 		
@@ -90,15 +94,18 @@ export default class EnemyAI {
 			let target = this.hGame.findOppoUnitByGridPos(this.isEnemy, gp);
 			if (target !== null) {
 				//alert("found target");
-				this.executeMoveAttack(
-					su, 
-					this.findBestAttackPosition(su, target), 
-					target
-				);
-				flagDone = true;
-				return; // you can't just return true here because it's inside a anonymous func
+				let destGP = this.findBestAttackPosition(su, target);
+				if (destGP !== null) {
+					this.executeMoveAttack(
+						su, 
+						destGP, 
+						target
+					);
+					flagDone = true;
+					return; // you can't just return true here because it's inside a anonymous func
 						// and you can't assume fOUAA ends here because it's inside a forEach loop!
 						// the moral is: old for loop RULES
+				}
             }
         });
         return flagDone;

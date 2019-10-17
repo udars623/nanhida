@@ -13,7 +13,7 @@ export default class effectStartPhase {
 
     update(df) {
         this.frame += df;
-        this.drawX -= 18.75 * df;
+        this.drawX -= 22 * df;
         if (this.frame > this.maxFrame) this.hGame.eventEffectEnd(this);
     }
 

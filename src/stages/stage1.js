@@ -2,6 +2,7 @@ import Stage from "/src/stage";
 import consts from "/src/consts";
 
 let T = consts.terrainTypes;
+let U = consts.unitTypes;
 
 let maxGrid = { x: 6, y: 8 };
 let terrainMap = [
@@ -20,56 +21,65 @@ let unitList = [
         gridPos: { x: 2, y: 7 },
         appearTurn: 0,
         isEnemy: false,
-        image: "img_kenshi"
+		typeID: U.pKenshi,
+		params: {}
     },
     {
         gridPos: { x: 3, y: 7 },
         appearTurn: 0,
         isEnemy: false,
-        image: "img_kenshi"
+		typeID: U.pKenshi,
+		params: {}
     },
     {
         gridPos: { x: 4, y: 7 },
         appearTurn: 0,
         isEnemy: false,
-        image: "img_kenshi"
+		typeID: U.pKenshi,
+		params: {}
     },
     {
         gridPos: { x: 5, y: 7 },
         appearTurn: 0,
         isEnemy: false,
-        image: "img_kenshi"
+		typeID: U.pKenshi,
+		params: {}
     },
 
     {
         gridPos: { x: 1, y: 1 },
         appearTurn: 0,
         isEnemy: true,
-        image: "img_kenshi2"
+		typeID: U.eKenshi,
+		params: {}
     },
     {
         gridPos: { x: 3, y: 2 },
         appearTurn: 0,
         isEnemy: true,
-        image: "img_kenshi2"
+		typeID: U.eKenshi,
+		params: {}
     },
     {
         gridPos: { x: 4, y: 1 },
         appearTurn: 0,
         isEnemy: true,
-        image: "img_kenshi2"
+		typeID: U.eKenshi,
+		params: {}
     },
     {
         gridPos: { x: 3, y: 4 },
         appearTurn: 0,
         isEnemy: true,
-        image: "img_kenshi2"
+		typeID: U.eKenshi,
+		params: {}
     },
     {
         gridPos: { x: 5, y: 2 },
         appearTurn: 0,
         isEnemy: true,
-        image: "img_kenshi2"
+		typeID: U.eKenshi,
+		params: {}
     }
 ];
 

@@ -3,37 +3,38 @@ import consts from "/src/consts";
 let terrainTypes = consts.terrainTypes;
 
 export default class UnitBase {
-    constructor(unitID, hGame, gridPos, isEnemy, imageId) {
+    constructor(unitID, hGame, gridPos, isEnemy) {
         this.unitID = unitID;
-
-        this.image = document.getElementById(imageId);
         this.hGame = hGame;
         this.gridPos = gridPos;
         this.coordinate = hGame.gridPosToPos(gridPos);
+
+		this.imageID = "img_kenshi";
         this.imageSize = {
             x: hGame.gridSize,
             y: hGame.gridSize
         };
-
+		
         this.isEnemy = isEnemy;
 
-        this.hp = 1;
-        this.attack = 255;
-        this.alive = true;
-
-        this.stamina = 0;
-        this.staminaMax = 1;
-
-        this.moveDistMax = 2;
-        this.attackRange = 1;
-		
-		this.moveDist = this.moveDistMax;
+		this.staminaMax = 1;
+		this.moveDistMax = 2;
+		this.attackRange = 1;
 
         this.pathData = null;
-
-        this.resetControlState();
-        this.resetProposal();
     }
+	
+	initAfterCreation() {
+		this.image = document.getElementById(this.imageID);
+		this.hp = 1;
+        this.attack = 255;
+        this.alive = true;
+		this.stamina = 0;
+		this.moveDist = this.moveDistMax;
+		
+		this.resetControlState();
+		this.resetProposal();
+	}
 
     resetControlState() {
         this.drawScale = 1;

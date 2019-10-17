@@ -16,7 +16,9 @@ export default class Stage {
         // push stuffs into game by calling events
         this.unitList.forEach(unit => {
             if (unit.appearTurn === 0)
-                hGame.eventPlaceUnit(unit.gridPos, unit.isEnemy, unit.image);
+                hGame.eventPlaceUnit(
+					unit.gridPos, unit.isEnemy, unit.typeID, unit.params
+				);
         });
 
         this.imageCache[T.Nrm] = document.getElementById("img_terrain_grass");
@@ -30,7 +32,9 @@ export default class Stage {
                 unit.appearTurn === hGame.turn &&
                 unit.isEnemy === (hGame.currentPhase === hGame.PHASE_ENEMY)
             )
-                hGame.eventPlaceUnit(unit.gridPos, unit.isEnemy, unit.image);
+                hGame.eventPlaceUnit(
+					unit.gridPos, unit.isEnemy, unit.typeID, unit.params
+				);
         });
     }
 

@@ -1,12 +1,12 @@
-import UnitBase from "/src/unitBase";
+//import UnitBase from "/src/unitBase";
 import Grid from "/src/grid";
 import EffectStartPhase from "/src/effects/effectStartPhase";
 import EnemyAI from "/src/enemyAI";
 import PathFinder from "/src/pathFinder";
-import Stage00 from "/src/stages/stage00";
-import Stage01 from "/src/stages/stage01";
 import consts from "/src/consts";
 import Button from "/src/button";
+import StageList from "/src/stages/stageList";
+import UnitCreator from "/src/units/unitCreator";
 
 export default class Game {
     constructor(gameWidth, gameHeight, canvas) {
@@ -22,6 +22,9 @@ export default class Game {
 
         this.gridSize = gameWidth / this.maxGrid.x;
         this.grid = new Grid(this.gridSize, this.maxGrid);
+		
+		this.stageList = new StageList();
+		this.unitCreator = new UnitCreator();
 	
 		this.buttonList = [];
 		this.makeButtons();
@@ -62,24 +65,25 @@ export default class Game {
         this.playerInputHandler = inputHandler;
     }
 
-    eventPlaceUnit(gridPos, isEnemy, image) {
+    eventPlaceUnit(gridPos, isEnemy, typeID, params) {
         this.unitID++;
-        if (isEnemy)
-            this.enemyUnitList.push(
-                new UnitBase(this.unitID, this, gridPos, isEnemy, image)
-            );
-        else
-            this.playerUnitList.push(
-                new UnitBase(this.unitID, this, gridPos, isEnemy, image)
-            );
+		
+		// WARNING: hasn't check the position yet!!!
+		// need to implement check before using reinforcements!
+		
+		let list = isEnemy ? this.enemyUnitList : this.playerUnitList;
+		let newUnit = this.unitCreator.createUnit(
+			this.unitID, this, gridPos, isEnemy, typeID, params
+		);
+		list.push(newUnit);
+		newUnit.initAfterCreation();
     }
 
     start(stageIdxStr) {
 		//alert("start")
 		this.resetGameState();
 		
-		if (stageIdxStr === "00") this.stage = Stage00();
-		if (stageIdxStr === "01") this.stage = Stage01();
+		this.stageList.loadStage(stageIdxStr, this);
 				
         this.stage.initStage(this);
 		

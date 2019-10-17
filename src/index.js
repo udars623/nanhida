@@ -19,7 +19,7 @@ game.bindPlayerInputHandler(playerInputHandler);
 
 let mapSelecter = new MapSelecter(game);
 
-game.start("01");
+game.start("0");
 
 let lastTime = 0;
 function gameLoop(timestamp) {
