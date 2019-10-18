@@ -226,10 +226,11 @@ export default class UnitBase {
     }
 
     isInPhase() {
-        return (
-            this.isEnemy ===
-            (this.hGame.currentPhase === this.hGame.PHASE_ENEMY)
+        let flag = (
+            this.isEnemy && (this.hGame.currentPhase === this.hGame.PHASE_ENEMY) ||
+            !this.isEnemy && (this.hGame.currentPhase === this.hGame.PHASE_PLAYER) 
         );
+		return flag;
     }
 
     update(df) {}

@@ -1,6 +1,7 @@
 //import UnitBase from "/src/unitBase";
 import Grid from "/src/grid";
 import EffectStartPhase from "/src/effects/effectStartPhase";
+import EffectGameOver from "/src/effects/effectGameOver";
 import EnemyAI from "/src/enemyAI";
 import PathFinder from "/src/pathFinder";
 import consts from "/src/consts";
@@ -166,14 +167,18 @@ export default class Game {
         //this.endPhase();
     }
 
+	addNewEffect(effect) {
+		this.effectList.push(effect);
+	}
+
     endPhase() {
         this.stage.endTurn(this);
         this.framesBeforeChangePhase = 80;
         this.isPhaseBlocked = true;
         if (this.currentPhase === this.PHASE_PLAYER) {
-            this.effectList.push(new EffectStartPhase(this, true));
-        } else {
-            this.effectList.push(new EffectStartPhase(this, false));
+            this.addNewEffect(new EffectStartPhase(this, true));
+        } else if (this.currentPhase === this.PHASE_ENEMY) {
+            this.addNewEffect(new EffectStartPhase(this, false));
         }
     }
 
@@ -250,7 +255,10 @@ export default class Game {
 
     eventUnitDeath(unit) {
         if (unit.isEnemy) removeObjectFromList(unit, this.enemyUnitList);
-        else removeObjectFromList(unit, this.playerUnitList);
+        else { 
+			removeObjectFromList(unit, this.playerUnitList);
+			this.gameResult = consts.gameResult.Lose;
+		}
 
         if (this.enemyUnitList.length <= 0)
             this.gameResult = consts.gameResult.Win;
@@ -281,27 +289,38 @@ export default class Game {
 		return this.moveAssistList.execute(user.params.moveAssist, user, target);
 	}
 
+	gameEnds() {
+		if (this.gameResult === consts.gameResult.Win) {
+			alert("You win!");
+			this.gameResult = consts.gameResult.GameEnded;
+			//this.currentPhase = this.PHASE_NONE;
+		}
+		if (this.gameResult === consts.gameResult.Lose) {
+			//alert("GAME OVER");
+			this.addNewEffect(new EffectGameOver(this));
+			this.gameResult = consts.gameResult.GameEnded;
+			//this.currentPhase = this.PHASE_NONE;
+		}
+	}
+
     update(df) {
+		if (this.gameResult !== consts.gameResult.None) {
+			this.gameEnds();
+			// return;
+		}
+		
 		this.buttonList.forEach(object => object.update(df));
 		
         if (this.framesBeforeChangePhase > 0) this.procChangePhase(df);
-        if (this.currentPhase === this.PHASE_ENEMY) this.enemyAI.update(df);
-        this.playerInputHandler.update(df);
+		if (this.gameResult === consts.gameResult.None) {
+			if (this.currentPhase === this.PHASE_ENEMY) this.enemyAI.update(df);
+			if (this.currentPhase === this.PHASE_PLAYER) this.playerInputHandler.update(df);
+		}
 
         this.playerUnitList.forEach(object => object.update(df));
         this.enemyUnitList.forEach(object => object.update(df));
 		
         this.effectList.forEach(object => object.update(df));
-		
-		if (this.gameResult === consts.gameResult.Win) {
-			alert("You win!");
-			this.gameResult = consts.gameResult.GameEnded;
-		}
-		if (this.gameResult === consts.gameResult.Lose) {
-			alert("GAME OVER");
-			this.gameResult = consts.gameResult.GameEnded;
-		}
-
     }
 
     draw(ctx) {
@@ -320,9 +339,6 @@ export default class Game {
 
         this.effectList.forEach(object => object.draw(ctx));
 
-        if (this.gameResult !== consts.gameResult.None) {
-            //alert("oxoxoxox");
-        }
     }
 
     gridPosToPos(gridPos) {
