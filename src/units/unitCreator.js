@@ -6,6 +6,10 @@ import PTomato from "/src/units/pTomato";
 import PBlueberry from "/src/units/pBlueberry";
 import PCabbage from "/src/units/pCabbage";
 import EKenshi from "/src/units/eKenshi";
+import EArcher from "/src/units/eArcher";
+import ECavLance from "/src/units/eCavLance";
+import ECavBow from "/src/units/eCavBow";
+import EDKAxe from "/src/units/eDKAxe";
 
 /*
 	When adding a new unit:
@@ -27,6 +31,10 @@ export default class UnitCreator {
 		this.list[uType.pCabbage] = PCabbage;
 		
 		this.list[uType.eKenshi] = EKenshi;
+		this.list[uType.eArcher] = EArcher;
+		this.list[uType.eCavLance] = ECavLance;
+		this.list[uType.eCavBow] = ECavBow;
+		this.list[uType.eDKAxe] = EDKAxe;
 	}
 	
 	createUnit(unitID, hGame, gridPos, isEnemy, typeID, params) {

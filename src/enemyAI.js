@@ -39,6 +39,10 @@ export default class EnemyAI {
     }
 
     executeMove(unit, dest) {
+		if (dest.x === unit.gridPos.x && dest.y === unit.gridPos.y) {
+			executeWait(unit);
+			return;
+		}
         this.absCon.clickGP(unit.gridPos);
         this.absCon.clickGP(dest);
         this.absCon.clickGP(dest);

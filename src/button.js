@@ -1,5 +1,14 @@
 let BUTTON_OFFSET_X = 10;
 
+/*
+	How to add button:
+	Usually, you don't need to change this file.
+	(1) Add the button in Game.makeButtons().
+	(2) Add consts.buttons entry.
+	(3) Add button trigger in AbsCon.clickButton().
+	(4) Implement the functionality of button in Game, UnitBase, etc.
+*/
+
 export default class Button {
 	constructor (hGame, imgString, id, drawGP) {
 		this.hGame = hGame;

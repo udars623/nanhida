@@ -1,5 +1,11 @@
 import UnitBase from "/src/unitBase";
 
+/*
+	params: {
+		moveAssist
+	}
+*/
+
 export default class ProtoPlayer extends UnitBase {
 	constructor(unitID, hGame, gridPos, isEnemy, params) {
 		super(unitID, hGame, gridPos, isEnemy);

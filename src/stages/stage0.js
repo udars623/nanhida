@@ -18,7 +18,28 @@ let terrainMap = [
 
 let unitList = [
     {
-        gridPos: { x: 4, y: 7 },
+        gridPos: { x: 4, y: 4 },
+        appearTurn: 0,
+        isEnemy: false,
+		typeID: U.pKenshi,
+		params: {}
+    },
+    {
+        gridPos: { x: 2, y: 2 },
+        appearTurn: 0,
+        isEnemy: false,
+		typeID: U.pKenshi,
+		params: {}
+    },
+    {
+        gridPos: { x: 3, y: 1 },
+        appearTurn: 0,
+        isEnemy: false,
+		typeID: U.pKenshi,
+		params: {}
+    },
+    {
+        gridPos: { x: 4, y: 2 },
         appearTurn: 0,
         isEnemy: false,
 		typeID: U.pKenshi,
@@ -29,7 +50,7 @@ let unitList = [
         gridPos: { x: 3, y: 2 },
         appearTurn: 0,
         isEnemy: true,
-		typeID: U.eKenshi,
+		typeID: U.eArcher,
 		params: {}
     }
 ];

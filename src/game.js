@@ -8,6 +8,7 @@ import Button from "/src/button";
 import StageList from "/src/stages/stageList";
 import UnitCreator from "/src/units/unitCreator";
 import MoveAssistList from "/src/skills/moveAssistList";
+import ThreatMap from "/src/ui/threatMap";
 
 export default class Game {
     constructor(gameWidth, gameHeight, canvas) {
@@ -51,6 +52,8 @@ export default class Game {
         this.pathFinder = new PathFinder(this);
 
         this.gameResult = consts.gameResult.None;	
+		
+		this.threatMap = new ThreatMap(this);
 	}
 	
 	makeButtons() {
@@ -59,6 +62,10 @@ export default class Game {
 		));
 		this.buttonList.push(new Button(
 			this, "img_button_turn_end", consts.buttons.TurnEnd, {x:7, y:2}
+		));
+		
+		this.buttonList.push(new Button(
+			this, "img_button_threat", consts.buttons.Threat, {x:7, y:8}
 		));
 	}
 
@@ -99,6 +106,16 @@ export default class Game {
 	requirePathUpdate() {
 		this.playerUnitList.forEach(object => object.eventRequirePathUpdate());
         this.enemyUnitList.forEach(object => object.eventRequirePathUpdate());
+		
+		this.updateThreatMap();
+	}
+
+	updateThreatMap() {
+		this.threatMap.updateThreatMap();
+	}
+	
+	toggleThreat() {
+		this.threatMap.toggleThreat();
 	}
 
 	countActiveUnits() {
@@ -298,6 +315,8 @@ export default class Game {
         this.enemyUnitList.forEach(object => object.drawUnitBG(ctx));
         this.playerUnitList.forEach(object => object.drawUnit(ctx));
         this.enemyUnitList.forEach(object => object.drawUnit(ctx));
+		
+		this.threatMap.draw(ctx);
 
         this.effectList.forEach(object => object.draw(ctx));
 
@@ -312,6 +331,15 @@ export default class Game {
             y: gridPos.y * this.gridSize - this.gridSize / 2
         };
     }
+	
+	// if making too many {} is really a problem then use this
+	gridPosToPosX(gpx) {
+		return gpx * this.gridSize - this.gridSize / 2;
+	}
+	
+	gridPosToPosY(gpy) {
+		return gpy * this.gridSize - this.gridSize / 2;
+	}
 
     posToGridPos(pos) {
         return {

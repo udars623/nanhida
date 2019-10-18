@@ -107,6 +107,9 @@ export default class AbstractController {
 			} else {
 				this.stateClearButton();
 			}
+        } else if (buttonID === consts.buttons.Threat) {
+            this.hGame.toggleThreat();
+			return true;
         }
         return false;
     }

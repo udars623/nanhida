@@ -21,6 +21,7 @@ export default class UnitBase {
 		this.moveDistMax = 2;
 		this.attackRange = 1;
 		this.params = null;
+		this.moveType = consts.moveTypes.infantry;
 		
         this.pathData = null;
     }
@@ -91,6 +92,8 @@ export default class UnitBase {
     }
 
 	checkTerrain(gridPos) {
+		if (this.moveType === consts.moveTypes.flyer) return true;
+		
 		if (this.hGame.stage.getTerrain(gridPos.x, gridPos.y) !==
             terrainTypes.Nrm
         ) 	return false;
