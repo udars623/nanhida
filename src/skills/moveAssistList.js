@@ -1,10 +1,16 @@
 import MoveAssist from "/src/skills/moveAssist";
 import consts from "/src/consts"
+import texts from "/src/texts/texts_jp"
+
+/* 
+	to add: change constructor, consts, texts.
+*/
 
 export default class MoveAssistList {
 	constructor (hGame) {
 		this.hGame = hGame;
 		this.list = [10];
+		this.names = [10];
 		
 		let repo = new MoveAssist(hGame);
 		repo.dUser[2] = 	{x: 0, y: 0};
@@ -23,7 +29,11 @@ export default class MoveAssistList {
 		swap.dTarget[2] = 	{x: 0, y: -1};
 		swap.copyToFourDirs();
 		this.list[consts.moveAssist.swap] = swap;
-
+		
+		for (const [key, value] of Object.entries(consts.moveAssist)) {
+			this.names[value] = texts.moveAssist[key];
+		}
+		//alert(this.names);
 	}
 	
 	checkEligibility(maID, user, dest, target) {

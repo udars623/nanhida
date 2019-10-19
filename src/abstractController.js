@@ -31,9 +31,17 @@ export default class AbstractController {
         this.currentTarget = null;
     }
 
+	stateSelect(unit) {
+		// state change not included here!!
+		this.currentUnit = unit;
+        unit.eventSelect();
+		this.hGame.eventSelectUnit(unit); // for UI update
+	}
+
     stateDeselect() {
         this.currentUnit.eventDeselect();
-        this.currentUnit = null;
+        this.currentUnit = null; 
+		this.hGame.eventDeselect(); // for UI update
 		if (this.currentTarget !== null) {
 			this.currentTarget.eventStopBeingTargeted();
 			this.currentTarget = null;
@@ -135,13 +143,11 @@ export default class AbstractController {
             let unit = this.hGame.findSelfUnitByGridPos(this.isEnemy, gp);
             if (unit !== null) {
                 if (unit.isActive()) this.ctrlState = CTRL_STATE_SELECTED;
-                this.currentUnit = unit;
-                unit.eventSelect();
+                this.stateSelect(unit);
             } else {
                 unit = this.hGame.findOppoUnitByGridPos(this.isEnemy, gp);
                 if (unit !== null) {
-                    this.currentUnit = unit;
-                    unit.eventSelect();
+                    this.stateSelect(unit);
                 }
             }
             if (unit === null) {

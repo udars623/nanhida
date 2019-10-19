@@ -9,6 +9,7 @@ export default class UnitBase {
         this.gridPos = gridPos;
         this.coordinate = hGame.gridPosToPos(gridPos);
 
+		this.nameStr = "nannhidaman";
 		this.imageID = "img_kenshi";
         this.imageSize = {
             x: hGame.gridSize,
@@ -24,9 +25,38 @@ export default class UnitBase {
 		this.moveType = consts.moveTypes.infantry;
 		
         this.pathData = null;
+		this.skillList = [];
     }
 	
+	createSkills() {
+		if (this.params !== null && 
+			typeof(this.params.skills) !== "undefined" &&
+			this.params.skills !== null
+		) {
+			this.params.skills.forEach(skillLevelPair => {
+				let newSkill = this.hGame.skillCreator.createSkill(
+					this, 
+					skillLevelPair.skill,
+					skillLevelPair.level,
+				);
+				this.skillList.push(newSkill);
+				
+			});
+		}
+	}
+	
+	applyPassiveSkills() {
+		this.skillList.forEach(skill => {
+			if (skill.isPassive === true) {
+				skill.applyOnce();
+			}
+		});
+	}
+	
 	initAfterCreation() {
+		this.createSkills();
+		this.applyPassiveSkills();
+		
 		this.image = document.getElementById(this.imageID);
 		this.hp = 1;
         this.attack = 255;
@@ -59,6 +89,10 @@ export default class UnitBase {
         if (this.stamina <= 0) return false;
         return true;
     }
+
+	isAlive() {
+		return (this.hp > 0);
+	}
 
     eventNewTurn() {
         // reset stamina
@@ -309,24 +343,37 @@ export default class UnitBase {
     }
 
     drawUnit(ctx) {
-        if (this.hasDestProposal) {
-            ctx.drawImage(
-                this.image,
-                this.destProposalCoord.x -
-                    (this.imageSize.x * this.drawScale) / 2,
-                this.destProposalCoord.y -
-                    (this.imageSize.y * this.drawScale) / 2,
-                this.imageSize.x * this.drawScale,
-                this.imageSize.y * this.drawScale
-            );
-        } else {
-            ctx.drawImage(
-                this.image,
-                this.coordinate.x - (this.imageSize.x * this.drawScale) / 2,
-                this.coordinate.y - (this.imageSize.y * this.drawScale) / 2,
-                this.imageSize.x * this.drawScale,
-                this.imageSize.y * this.drawScale
-            );
-        }
+		if (this.isAlive()) {
+			if (this.hasDestProposal) {
+				ctx.drawImage(
+					this.image,
+					this.destProposalCoord.x -
+						(this.imageSize.x * this.drawScale) / 2,
+					this.destProposalCoord.y -
+						(this.imageSize.y * this.drawScale) / 2,
+					this.imageSize.x * this.drawScale,
+					this.imageSize.y * this.drawScale
+				);
+			} else {
+				ctx.drawImage(
+					this.image,
+					this.coordinate.x - (this.imageSize.x * this.drawScale) / 2,
+					this.coordinate.y - (this.imageSize.y * this.drawScale) / 2,
+					this.imageSize.x * this.drawScale,
+					this.imageSize.y * this.drawScale
+				);
+			}
+		} else {
+			if (this.graveImage === undefined) 
+				this.graveImage = document.getElementById("img_dead");
+			
+			ctx.drawImage(
+				this.graveImage,
+				this.coordinate.x - (this.imageSize.x * this.drawScale) / 2,
+				this.coordinate.y - (this.imageSize.y * this.drawScale) / 2,
+				this.imageSize.x * this.drawScale,
+				this.imageSize.y * this.drawScale
+			);
+		}
     }
 }

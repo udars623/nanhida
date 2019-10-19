@@ -1,9 +1,9 @@
-export default class effectGameOver {
+export default class effectStageClear {
     constructor(hGame) {
         this.frame = 1;
         this.maxFrame = 200;
 		this.hCanvas = document.getElementById("gameScreen");
-		this.image = document.getElementById("img_effect_gameOver");
+		this.image = document.getElementById("img_effect_stageClear");
         this.drawX = this.hCanvas.width / 2;
         this.drawY = this.hCanvas.height / 2;
 		this.drawScale = 0.05;

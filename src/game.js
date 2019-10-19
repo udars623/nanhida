@@ -2,14 +2,17 @@
 import Grid from "/src/grid";
 import EffectStartPhase from "/src/effects/effectStartPhase";
 import EffectGameOver from "/src/effects/effectGameOver";
+import EffectStageClear from "/src/effects/effectStageClear";
 import EnemyAI from "/src/enemyAI";
 import PathFinder from "/src/pathFinder";
 import consts from "/src/consts";
 import Button from "/src/button";
 import StageList from "/src/stages/stageList";
 import UnitCreator from "/src/units/unitCreator";
+import SkillCreator from "/src/skills/skillCreator";
 import MoveAssistList from "/src/skills/moveAssistList";
 import ThreatMap from "/src/ui/threatMap";
+import StatusPanel from "/src/ui/statusPanel";
 
 export default class Game {
     constructor(gameWidth, gameHeight, canvas) {
@@ -29,6 +32,7 @@ export default class Game {
 		this.stageList = new StageList();
 		this.unitCreator = new UnitCreator();
 		this.moveAssistList = new MoveAssistList(this);
+		this.skillCreator = new SkillCreator();
 	
 		this.buttonList = [];
 		this.makeButtons();
@@ -55,6 +59,7 @@ export default class Game {
         this.gameResult = consts.gameResult.None;	
 		
 		this.threatMap = new ThreatMap(this);
+		this.statusPanel = new StatusPanel(this);
 	}
 	
 	makeButtons() {
@@ -147,6 +152,14 @@ export default class Game {
 			if (unit.isActive()) unit.eventExecuteWait();
 		});
 
+	}
+
+	eventSelectUnit(unit) {
+		this.statusPanel.eventSelectUnit(unit);
+	}
+	
+	eventDeselect() {
+		this.statusPanel.eventDeselect();
 	}
 
     playerPhase() {
@@ -256,15 +269,12 @@ export default class Game {
     eventUnitDeath(unit) {
         if (unit.isEnemy) removeObjectFromList(unit, this.enemyUnitList);
         else { 
-			removeObjectFromList(unit, this.playerUnitList);
+			//removeObjectFromList(unit, this.playerUnitList); // to draw the grave
 			this.gameResult = consts.gameResult.Lose;
 		}
 
         if (this.enemyUnitList.length <= 0)
             this.gameResult = consts.gameResult.Win;
-        else if (this.playerUnitList.length <= 0) {
-            this.gameResult = consts.gameResult.Lose;
-        }
     }
 
     eventEffectEnd(effect) {
@@ -291,7 +301,7 @@ export default class Game {
 
 	gameEnds() {
 		if (this.gameResult === consts.gameResult.Win) {
-			alert("You win!");
+			this.addNewEffect(new EffectStageClear(this));
 			this.gameResult = consts.gameResult.GameEnded;
 			//this.currentPhase = this.PHASE_NONE;
 		}
@@ -327,6 +337,7 @@ export default class Game {
         this.stage.draw(ctx);
 		this.buttonList.forEach(object => object.draw(ctx));
         this.grid.draw(ctx);
+		this.statusPanel.draw(ctx);
 		
 		this.playerUnitList.forEach(object => object.drawThreat(ctx));
         this.enemyUnitList.forEach(object => object.drawThreat(ctx));

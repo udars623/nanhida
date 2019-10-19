@@ -40,6 +40,10 @@ const consts = {
 		reposition: 0,
 		drawBack: 1,
 		swap: 2
+	},
+	skills: {
+		none: 0,
+		extraStamina: 1,
 	}
 };
 export default consts;
