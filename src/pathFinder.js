@@ -1,6 +1,6 @@
 const dx = [0, -1, +1, 0];
 const dy = [+1, 0, 0, -1];
-let dAtk = [3];
+let dAtk = [];
 dAtk[0] = [];
 dAtk[1] = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
 dAtk[2] = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
@@ -30,13 +30,13 @@ export default class PathFinder {
 		}
     */
     floodFill(unit, startGP, searchRange, flagIgnoreUnit = false) {
-        let prev = [this.maxGrid.x + 1];
-        let dist = [this.maxGrid.x + 1];
-		let attackable = [this.maxGrid.x + 1];
+        let prev = [];
+        let dist = [];
+		let attackable = [];
         for (let i = 1; i <= this.maxGrid.x; i++) {
-            prev[i] = [this.maxGrid.y + 1];
-            dist[i] = [this.maxGrid.y + 1];
-            attackable[i] = [this.maxGrid.y + 1];
+            prev[i] = [];
+            dist[i] = [];
+            attackable[i] = [];
             for (let j = 1; j <= this.maxGrid.y; j++) {
                 dist[i][j] = MAX_DIST;
                 prev[i][j] = null;
@@ -122,7 +122,7 @@ export default class PathFinder {
                 x = xNew;
                 //alert(x + "," + y);
             }
-            let path = [dist];
+            let path = [];
             x = goalGP.x;
             y = goalGP.y;
             for (let i = 0; i < dist; i++) {

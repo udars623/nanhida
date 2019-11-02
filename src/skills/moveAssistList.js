@@ -9,8 +9,8 @@ import texts from "/src/texts/texts_jp"
 export default class MoveAssistList {
 	constructor (hGame) {
 		this.hGame = hGame;
-		this.list = [10];
-		this.names = [10];
+		this.list = [];
+		this.names = [];
 		
 		let repo = new MoveAssist(hGame);
 		repo.dUser[2] = 	{x: 0, y: 0};

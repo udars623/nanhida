@@ -10,7 +10,7 @@ import ExtraStamina from "/src/skills/passive/extraStamina";
 
 export default class SkillCreator {
 	constructor () {
-		this.list = [100];
+		this.list = [];
 		this.list[consts.skills.extraStamina] = ExtraStamina;
 	}
 	

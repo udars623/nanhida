@@ -39,8 +39,10 @@ export default class AbstractController {
 	}
 
     stateDeselect() {
-        this.currentUnit.eventDeselect();
-        this.currentUnit = null; 
+		if (this.currentUnit !== null) {
+			this.currentUnit.eventDeselect();
+			this.currentUnit = null; 
+		}
 		this.hGame.eventDeselect(); // for UI update
 		if (this.currentTarget !== null) {
 			this.currentTarget.eventStopBeingTargeted();
@@ -118,6 +120,9 @@ export default class AbstractController {
         } else if (buttonID === consts.buttons.Threat) {
             this.hGame.toggleThreat();
 			return true;
+        } else if (buttonID === consts.buttons.Barrier) {
+            this.hGame.toggleBarrier();
+			return true;
         }
         return false;
     }
@@ -152,6 +157,7 @@ export default class AbstractController {
             }
             if (unit === null) {
                 //localAlert("No unit found");
+				this.stateDeselect();
                 this.ctrlState = CTRL_STATE_NONE;
                 return false;
             }

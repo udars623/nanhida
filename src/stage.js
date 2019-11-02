@@ -2,10 +2,11 @@ import consts from "/src/consts";
 let T = consts.terrainTypes;
 
 export default class Stage {
-    constructor(maxGrid, terrainMap, unitList) {
+    constructor(maxGrid, terrainMap, unitList, nameStr) {
         this.maxGrid = maxGrid;
         this.terrainMap = terrainMap; // NOTE: use it as [y-1][x-1] !! or getTerrain(x,y)
         this.unitList = unitList;
+		this.nameStr = nameStr;
 
         this.imageCache = [];
         this.hGame = null; // should not be initialised in constructor because it's called by stage scripts rather than game

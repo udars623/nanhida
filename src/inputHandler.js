@@ -19,10 +19,12 @@ export default class InputHandler {
 
         if (this.isMobile) {
             this.hCanvas.addEventListener("touchmove", event => {
-                event.preventDefault();
+				if (event.touches === undefined || event.touches.length === 1)
+					event.preventDefault();
             });
             this.hCanvas.addEventListener("touchend", event => {
-                event.preventDefault();
+				if (event.touches === undefined || event.touches.length === 1)
+					event.preventDefault();
             });
         }
     }

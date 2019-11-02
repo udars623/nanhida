@@ -7,7 +7,6 @@ export default class UnitBase {
         this.unitID = unitID;
         this.hGame = hGame;
         this.gridPos = gridPos;
-        this.coordinate = hGame.gridPosToPos(gridPos);
 
 		this.nameStr = "nannhidaman";
 		this.imageID = "img_kenshi";
@@ -53,19 +52,35 @@ export default class UnitBase {
 		});
 	}
 	
+	// need to be called manually by Game after creation
 	initAfterCreation() {
 		this.createSkills();
 		this.applyPassiveSkills();
 		
 		this.image = document.getElementById(this.imageID);
+		
+		let zokuStr = "img_effect_zoku_grey";
+		if (this.params !== null && this.params.zokusei !== undefined) {
+			if (this.params.zokusei === consts.zokusei.red) zokuStr = "img_effect_zoku_red";
+			if (this.params.zokusei === consts.zokusei.blue) zokuStr = "img_effect_zoku_blue";
+			if (this.params.zokusei === consts.zokusei.green) zokuStr = "img_effect_zoku_green";
+		}
+		this.imageZokusei = document.getElementById(zokuStr);
+		
 		this.hp = 1;
         this.attack = 255;
         this.alive = true;
 		this.stamina = 0;
 		this.moveDist = this.moveDistMax;
 		
+		this.updateCoordinate();
+		
 		this.resetControlState();
 		this.resetProposal();
+		
+		if (consts.settings.showUnitID === true) {
+			this.nameStr = this.nameStr + " (" + this.unitID + ")";
+		}
 	}
 
     resetControlState() {
@@ -172,7 +187,7 @@ export default class UnitBase {
 	
     acceptPath(path) {
         this.pathToDestProposal = path;
-        this.pathToDestProposalCoord = [path.length];
+        this.pathToDestProposalCoord = [];
         let len = path.length;
         for (let i = 0; i < len; i++) {
             //alert(i + "," + path[i].x + "," + path[i].y);
@@ -199,22 +214,33 @@ export default class UnitBase {
         this.hGame.eventActionExecuted();
     }
 
+	// possibly the stupidest thing in this class
+	updateCoordinate() {
+		this.coordinate = this.hGame.gridPosToPos(this.gridPos);
+	}
+
     eventExecuteMovement() {
 		this.stamina = 1; // to make sure it becomes 0 after executeAction
         this.gridPos = this.destProposalGP;
-        this.coordinate = this.hGame.gridPosToPos(this.gridPos);
+        this.updateCoordinate();
         this.executeAction();
     }
 	
 	eventUseMoveAssist(gpNew) {
 		this.gridPos = gpNew;
-		this.coordinate = this.hGame.gridPosToPos(this.gridPos);
+		this.updateCoordinate();
 		this.executeAction();
 	}
 	
 	eventMovedByMoveAssist(gpNew) {
 		this.gridPos = gpNew;
-		this.coordinate = this.hGame.gridPosToPos(this.gridPos);
+		this.updateCoordinate();
+	}
+	
+	// used in e.g. resolving reinforcement conflict
+	eventForceMovement(gpNew) {
+		this.gridPos = gpNew;
+		this.updateCoordinate();
 	}
 
     checkAttackTarget(unit, destProposalGP) {
@@ -241,7 +267,7 @@ export default class UnitBase {
 
     eventExecuteAttack(unit) {
         this.gridPos = this.destProposalGP;
-        this.coordinate = this.hGame.gridPosToPos(this.gridPos);
+        this.updateCoordinate();
         this.hGame.eventBattle(this, unit);
         this.executeAction();
     }
@@ -297,6 +323,8 @@ export default class UnitBase {
 	}
 
     drawUnitBG(ctx) {
+		let halfscale = 0.47;
+		
         if (this.isSelected || this.isTargeted) {
             if (this.isEnemy) ctx.fillStyle = "rgba(255,85,85,0.9)";
             else ctx.fillStyle = "rgba(136,136,238,0.9)";
@@ -308,10 +336,10 @@ export default class UnitBase {
             else ctx.fillStyle = "rgba(238,238,255,0.8)";
         }
         ctx.fillRect(
-            this.coordinate.x - this.imageSize.x * 0.45,
-            this.coordinate.y - this.imageSize.y * 0.45,
-            this.imageSize.x * 0.9,
-            this.imageSize.y * 0.9
+            this.coordinate.x - this.imageSize.x * halfscale,
+            this.coordinate.y - this.imageSize.y * halfscale,
+            this.imageSize.x * 2 * halfscale,
+            this.imageSize.y * 2 * halfscale
         );
 
         if (this.hasDestProposal) {
@@ -322,11 +350,11 @@ export default class UnitBase {
                 for (let i = 1; i < len; i++) {
                     ctx.fillRect(
                         this.pathToDestProposalCoord[i].x -
-                            this.imageSize.x * 0.45,
+                            this.imageSize.x * halfscale,
                         this.pathToDestProposalCoord[i].y -
-                            this.imageSize.y * 0.45,
-                        this.imageSize.x * 0.9,
-                        this.imageSize.y * 0.9
+                            this.imageSize.y * halfscale,
+                        this.imageSize.x * 2 * halfscale,
+                        this.imageSize.y * 2 * halfscale
                     );
                 }
             }
@@ -334,10 +362,10 @@ export default class UnitBase {
             if (this.isEnemy) ctx.fillStyle = "#e88";
             else ctx.fillStyle = "#88e";
             ctx.fillRect(
-                this.destProposalCoord.x - this.imageSize.x * 0.45,
-                this.destProposalCoord.y - this.imageSize.y * 0.45,
-                this.imageSize.x * 0.9,
-                this.imageSize.y * 0.9
+                this.destProposalCoord.x - this.imageSize.x * halfscale,
+                this.destProposalCoord.y - this.imageSize.y * halfscale,
+                this.imageSize.x * 2 * halfscale,
+                this.imageSize.y * 2 * halfscale
             );
         }
     }
@@ -354,9 +382,25 @@ export default class UnitBase {
 					this.imageSize.x * this.drawScale,
 					this.imageSize.y * this.drawScale
 				);
+				ctx.drawImage(
+					this.imageZokusei,
+					this.destProposalCoord.x -
+						(this.imageSize.x * this.drawScale) / 2,
+					this.destProposalCoord.y -
+						(this.imageSize.y * this.drawScale) / 2,
+					this.imageSize.x * this.drawScale,
+					this.imageSize.y * this.drawScale
+				);
 			} else {
 				ctx.drawImage(
 					this.image,
+					this.coordinate.x - (this.imageSize.x * this.drawScale) / 2,
+					this.coordinate.y - (this.imageSize.y * this.drawScale) / 2,
+					this.imageSize.x * this.drawScale,
+					this.imageSize.y * this.drawScale
+				);
+				ctx.drawImage(
+					this.imageZokusei,
 					this.coordinate.x - (this.imageSize.x * this.drawScale) / 2,
 					this.coordinate.y - (this.imageSize.y * this.drawScale) / 2,
 					this.imageSize.x * this.drawScale,

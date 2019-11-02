@@ -11,7 +11,6 @@ export default class PKenshiJinlai extends ProtoPlayer {
 		this.moveDistMax = 2;
 		this.attackRange = 1;
 		
-		this.params.skills = [];
 		this.params.skills.push({
 			skill: "extraStamina",
 			level: 1

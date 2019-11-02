@@ -13,6 +13,7 @@ import SkillCreator from "/src/skills/skillCreator";
 import MoveAssistList from "/src/skills/moveAssistList";
 import ThreatMap from "/src/ui/threatMap";
 import StatusPanel from "/src/ui/statusPanel";
+import GeneralTimer from "/src/ui/generalTimer";
 
 export default class Game {
     constructor(gameWidth, gameHeight, canvas) {
@@ -46,6 +47,7 @@ export default class Game {
         this.unitID = 0;
 
         this.effectList = [];
+		this.timerList = [];
 
         this.currentPhase = this.PHASE_NONE;
         this.isPhaseBlocked = false;
@@ -60,6 +62,11 @@ export default class Game {
 		
 		this.threatMap = new ThreatMap(this);
 		this.statusPanel = new StatusPanel(this);
+		
+		this.flagDrawAllBarrier = false;
+		this.flagUnitSelected = false;
+		this.barrierConnectionTimer = new GeneralTimer(this, 0.04, 3);
+		this.timerList.push(this.barrierConnectionTimer);
 	}
 	
 	makeButtons() {
@@ -73,6 +80,10 @@ export default class Game {
 		this.buttonList.push(new Button(
 			this, "img_button_threat", consts.buttons.Threat, {x:7, y:8}
 		));
+		
+		this.buttonList.push(new Button(
+			this, "img_button_barrier", consts.buttons.Barrier, {x:7, y:7}
+		));
 	}
 
     bindPlayerInputHandler(inputHandler) {
@@ -82,8 +93,11 @@ export default class Game {
     eventPlaceUnit(gridPos, isEnemy, typeID, params) {
         this.unitID++;
 		
-		// WARNING: hasn't check the position yet!!!
-		// need to implement check before using reinforcements!
+		let flagConflict = false;
+		if (this.findUnitByGridPos(gridPos) !== null) {
+			flagConflict = true;
+			//alert("unit placement conflict detected");
+		}
 		
 		let list = isEnemy ? this.enemyUnitList : this.playerUnitList;
 		let newUnit = this.unitCreator.createUnit(
@@ -91,7 +105,24 @@ export default class Game {
 		);
 		list.push(newUnit);
 		newUnit.initAfterCreation();
+		
+		if (flagConflict) this.resolveNewUnitConflict(newUnit);
+		
+		//alert("unit created with ID = " + this.unitID);
     }
+	
+	resolveNewUnitConflict(unit) {
+		let pdir = this.pathFinder.floodFill(unit, unit.gridPos, 300, true);
+		let len = pdir.listPossibleDest.length;
+		for (let i = 0; i < len; i ++) {
+			if (this.findUnitByGridPos(pdir.listPossibleDest[i]) === null) {
+				unit.eventForceMovement(pdir.listPossibleDest[i]);
+				//alert("Replace new unit to "+unit.gridPos.x+","+unit.gridPos.y);
+				break;
+			}
+		}
+		
+	}
 	
 	startDefaultStage() {
 		this.start(this.stageList.defaultStageIdx);
@@ -122,6 +153,11 @@ export default class Game {
 	
 	toggleThreat() {
 		this.threatMap.toggleThreat();
+	}
+	
+	toggleBarrier() {
+		this.flagDrawAllBarrier = !this.flagDrawAllBarrier;
+		this.barrierConnectionTimer.resetTimer();
 	}
 
 	countActiveUnits() {
@@ -156,10 +192,14 @@ export default class Game {
 
 	eventSelectUnit(unit) {
 		this.statusPanel.eventSelectUnit(unit);
+		this.flagUnitSelected = true;
+		this.barrierConnectionTimer.resetTimer();
 	}
 	
 	eventDeselect() {
 		this.statusPanel.eventDeselect();
+		this.flagUnitSelected = false;
+		this.barrierConnectionTimer.resetTimer();
 	}
 
     playerPhase() {
@@ -247,6 +287,17 @@ export default class Game {
         return null;
     }
 
+	findUnitByID(isEnemy, id) {
+		//alert(id);
+		let unit = this.enemyUnitList.find(function (unit) {return unit.unitID === id;});
+		//let unit = null;
+		//this.enemyUnitList.forEach(u => {if (u.unitID === id) unit = u;})
+		//alert(unit);
+		return unit;
+		//if (isEnemy) return ;
+		//else return this.playerUnitList.find(unit => unit.unitID === id);
+	}
+
 	findButton(pos) {
 		let result = null;
 		this.buttonList.forEach(button => {
@@ -267,6 +318,14 @@ export default class Game {
     }
 
     eventUnitDeath(unit) {
+		if (unit.isEnemy) {
+			this.enemyUnitList.forEach(eu => {
+				if (eu.barrierTotal !== null && eu.barrierTotal > 0) {
+					eu.eventLoseBarrier(unit);
+				}
+			});
+		}
+		
         if (unit.isEnemy) removeObjectFromList(unit, this.enemyUnitList);
         else { 
 			//removeObjectFromList(unit, this.playerUnitList); // to draw the grave
@@ -319,6 +378,7 @@ export default class Game {
 			// return;
 		}
 		
+		this.timerList.forEach(object => object.update(df));
 		this.buttonList.forEach(object => object.update(df));
 		
         if (this.framesBeforeChangePhase > 0) this.procChangePhase(df);
@@ -345,6 +405,11 @@ export default class Game {
         this.enemyUnitList.forEach(object => object.drawUnitBG(ctx));
         this.playerUnitList.forEach(object => object.drawUnit(ctx));
         this.enemyUnitList.forEach(object => object.drawUnit(ctx));
+		
+		this.enemyUnitList.forEach(object => {
+			if (object.drawBarrierConnection !== undefined) 
+				object.drawBarrierConnection(ctx);
+		});
 		
 		this.threatMap.draw(ctx);
 

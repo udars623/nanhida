@@ -13,7 +13,6 @@ export default class PBlueberry extends ProtoPlayer {
 		
 		this.params.moveAssist = consts.moveAssist.swap;
 		
-		this.params.skills = [];
 		this.params.skills.push({
 			skill: "extraStamina",
 			level: 1

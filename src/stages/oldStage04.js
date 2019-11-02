@@ -4,6 +4,8 @@ import consts from "/src/consts";
 let T = consts.terrainTypes;
 let U = consts.unitTypes;
 
+let nameStr = "古の「Stage 04」";
+
 let maxGrid = { x: 6, y: 8 };
 let terrainMap = [
     [T.Nrm, T.Nrm, T.Nrm, T.Nrm, T.Nrm, T.Nrm],
@@ -111,6 +113,6 @@ let unitList = [
     }
 ];
 
-export default function createStage()	{
-	return new Stage(maxGrid, terrainMap, unitList);
-}
+export default {nameStr: nameStr, stageCreator: function () {
+	return new Stage(maxGrid, terrainMap, unitList, nameStr);
+}}

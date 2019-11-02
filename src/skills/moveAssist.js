@@ -7,8 +7,8 @@ export default class MoveAssist {
 	constructor (hGame) {
 		this.hGame = hGame;
 		
-		this.dUser = [10]; // [2:{x,y}, 4, 6, 8]
-		this.dTarget = [10];
+		this.dUser = []; // [2:{x,y}, 4, 6, 8]
+		this.dTarget = [];
 		
 		for (let i = 0; i <= 9; i ++) {
 			this.dUser[i] = null;

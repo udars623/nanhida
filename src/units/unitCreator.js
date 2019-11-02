@@ -21,7 +21,7 @@ let uType = consts.unitTypes;
 
 export default class UnitCreator {
 	constructor () {
-		this.list = [60];
+		this.list = [];
 		
 		this.list[uType.unitBase] = UnitBase;
 		this.list[uType.pKenshi] = PKenshi;

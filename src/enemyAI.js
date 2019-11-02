@@ -2,12 +2,14 @@ import AbstractController from "/src/abstractController";
 import consts from "/src/consts";
 
 // remember to check 1~maxGrid when using this stuff
-let dAtk = [3];
+let dAtk = [];
 dAtk[0] = [];
 dAtk[1] = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
 dAtk[2] = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
 			{x:+2, y:0}, {x:-1, y:-1}, {x:+1, y:-1}, {x:0, y:-2}];
-const MAX_DIST = 100000;
+const MAX_DIST = 100000-1;
+
+let zoku = consts.zokusei;
 
 export default class EnemyAI {
     constructor(hGame, isEnemy) {
@@ -24,11 +26,14 @@ export default class EnemyAI {
         }
 
         this.absCon = new AbstractController(this.hGame, isEnemy);
+		
+		this.suPDIR = null; // path data with inf search range
+		this.ouPDIR = null;
 
         this.blockFrameRemain = 0;
         this.blockFramePerAttack = 18;
         this.blockFramePerMove = 18;
-        this.blockFramePerWait = 5;
+        this.blockFramePerWait = 10;
     }
 
     executeWait(unit) {
@@ -40,7 +45,7 @@ export default class EnemyAI {
 
     executeMove(unit, dest) {
 		if (dest.x === unit.gridPos.x && dest.y === unit.gridPos.y) {
-			executeWait(unit);
+			this.executeWait(unit);
 			return;
 		}
         this.absCon.clickGP(unit.gridPos);
@@ -116,6 +121,43 @@ export default class EnemyAI {
         });
         return flagDone;
     }
+	
+	//return +1: advantage;  -1: disadvantage;  0: tie or N/A
+	compareZokusei(su, ou) {
+		if (su.params === null || ou.params === null) return 0;
+		if (su.params.zokusei === undefined || ou.params.zokusei === undefined) return 0;
+		if (su.params.zokusei === zoku.none || ou.params.zokusei === zoku.none) return 0;
+		if (su.params.zokusei === zoku.red && ou.params.zokusei === zoku.green ||
+			su.params.zokusei === zoku.green && ou.params.zokusei === zoku.blue ||
+			su.params.zokusei === zoku.blue && ou.params.zokusei === zoku.red)
+			return +1;
+		if (ou.params.zokusei === zoku.red && su.params.zokusei === zoku.green ||
+			ou.params.zokusei === zoku.green && su.params.zokusei === zoku.blue ||
+			ou.params.zokusei === zoku.blue && su.params.zokusei === zoku.red)
+			return -1;
+		return 0;
+	}
+
+	// define how zokusei works for deciding chase target
+	zokuseiChasingDistScore(su, ou) {
+		let rate = 1; // replace it when chasing skills are implemented
+		return (-(rate * su.moveDist) - 0.5) * this.compareZokusei(su, ou);
+	}
+
+	// for chasing gp tiebreaker
+	getChasingPosScore(su, gp, target) {
+		let score = 0;
+		let len = this.ouList.length;
+		for (let i = 0; i < len; i ++) {
+			let z = this.compareZokusei(su, this.ouList[i]);
+			score += 100 * this.ouPDIR[i].dist[gp.x][gp.y] * (-z);
+		}
+		score -= Math.abs(
+			Math.abs(target.gridPos.x - gp.x) - 
+			Math.abs(target.gridPos.y - gp.y)
+		);
+		return score;
+	}
 
     tryGetClose(suIdx) {
         let su = this.suList[suIdx];
@@ -123,22 +165,37 @@ export default class EnemyAI {
 
         let minDist = 10000;
         let bestGP = null;
+		let bestTarget = null;
+		let bestScore = null;
         su.pathData.listPossibleDest.forEach(gp => {
-            if (this.hGame.findSelfUnitByGridPos(this.isEnemy, gp) !== null)
+            if (this.hGame.findSelfUnitByGridPos(this.isEnemy, gp) !== null &&
+				this.hGame.findSelfUnitByGridPos(this.isEnemy, gp) !== su)
                 return;
             //alert("gp: " + gp.x + "," + gp.y);
-            let wideSearch = this.hGame.pathFinder.floodFill(su, gp, 300, true);
+            let pdir = this.hGame.pathFinder.floodFill(su, gp, 300, true);
             this.ouList.forEach(target => {
                 let distTarget =
-                    wideSearch.dist[target.gridPos.x][target.gridPos.y];
+                    pdir.dist[target.gridPos.x][target.gridPos.y]
+					+ this.zokuseiChasingDistScore(su, target);
                 //alert(target.unitID + "," + distTarget);
                 if (distTarget < minDist) {
                     minDist = distTarget;
                     bestGP = gp;
-                }
+					bestTarget = target;
+					bestScore = this.getChasingPosScore(su, gp, target);
+					//alert(target.unitID + " @ "+gp.x+","+gp.y+" : "+bestScore);
+                } else if (distTarget === minDist) {
+					let newScore = this.getChasingPosScore(su, gp, target);
+					//alert(target.unitID + " @ "+gp.x+","+gp.y+" : "+newScore);
+					if (newScore > bestScore) {
+						bestGP = gp;
+						bestTarget = target;
+						bestScore = newScore;
+					}
+				}
             });
         });
-        //alert(minDist + ", " + bestGP);
+        //alert(minDist + " @ (" + bestGP.x + "," + bestGP.y + ") -> " + bestTarget.nameStr);
         if (bestGP !== null) {
             this.executeMove(su, bestGP);
             return true;
@@ -146,19 +203,55 @@ export default class EnemyAI {
 
         return false;
     }
+	
+	findClosestUnit() {
+		let minDist = 10000;
+		let closestUnitIdx = null;
+		
+		let len = this.suList.length;
+        for (let i = 0; i < len; i++) {
+			let su = this.suList[i];
+			if (!su.isActive()) continue;
+			this.ouList.forEach(ou => {
+				//let dist = Math.abs(su.gridPos.x - ou.gridPos.x) + Math.abs(su.gridPos.y - ou.gridPos.y);
+				let dist = this.suPDIR[i].dist[ou.gridPos.x][ou.gridPos.y];
+				//alert(su.unitID+" -> "+ou.unitID +" = "+ dist);
+				if (dist < minDist) {
+					minDist = dist;
+					closestUnitIdx = i;
+				}
+			});
+		}
+		
+		return closestUnitIdx;
+	}
+
+	// update path data with inf search range
+	updatePDIR() {
+		let suLen = this.suList.length;
+		this.suPDIR = [];
+		for (let i = 0; i < suLen; i ++) {
+			this.suPDIR[i] = this.hGame.pathFinder.floodFill(
+				this.suList[i], this.suList[i].gridPos, 300, true
+			);
+		}
+		let ouLen = this.ouList.length;
+		this.ouPDIR = [];
+		for (let i = 0; i < ouLen; i ++) {
+			this.ouPDIR[i] = this.hGame.pathFinder.floodFill(
+				this.ouList[i], this.ouList[i].gridPos, 300, true
+			);
+		}
+	}
 
     makeOneMove() {
-        let i = 0,
-            len = this.suList.length;
-        for (i = 0; i < len; i++) {
-            if (this.suList[i].stamina > 0) {
-                let res = this.findOppoUnitAndAttack(i);
-                if (res === false) res = this.tryGetClose(i);
-                if (res === false) this.executeWait(this.suList[i]);
-				
-                return;
-            }
-        }
+		this.updatePDIR();
+		let suIdx = this.findClosestUnit();
+		if (suIdx !== null) {
+			let res = this.findOppoUnitAndAttack(suIdx);
+			if (res === false) res = this.tryGetClose(suIdx);
+			if (res === false) this.executeWait(this.suList[suIdx]);
+		}
     }
 
     update(df) {

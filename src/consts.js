@@ -9,6 +9,7 @@ const consts = {
         TurnEnd: 0,
         Wait: 1,
 		Threat: 2,
+		Barrier: 3,
     },
     gameResult: {
         None: 0,
@@ -36,6 +37,12 @@ const consts = {
 		eCavBow: 14,
 		eDKAxe: 15
 	},
+	zokusei: {
+		none: 0,
+		red: 1,
+		green: 2,
+		blue: 3
+	},
 	moveAssist: {
 		reposition: 0,
 		drawBack: 1,
@@ -44,6 +51,9 @@ const consts = {
 	skills: {
 		none: 0,
 		extraStamina: 1,
+	},
+	settings: {
+		showUnitID: true,
 	}
 };
 export default consts;

@@ -8,9 +8,9 @@ export default class ThreatMap {
 		
 		this.flagShowThreat = false;
 		
-		this.threatMap = [this.maxGrid.x+1];
+		this.threatMap = [];
 		for (let x = 1; x <= this.maxGrid.x; x++) {
-			this.threatMap[x] = [this.maxGrid.y+1];
+			this.threatMap[x] = [];
 		}
 		
 		this.thickness = 2;
