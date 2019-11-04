@@ -9,7 +9,8 @@ export default class Stage {
 		this.nameStr = nameStr;
 
         this.imageCache = [];
-        this.hGame = null; // should not be initialised in constructor because it's called by stage scripts rather than game
+        this.hGame = null; 	// should not be initialised in constructor 
+							// because it's called by stage scripts rather than game
     }
 
     initStage(hGame) {
@@ -26,8 +27,8 @@ export default class Stage {
         this.imageCache[T.Mnt] = document.getElementById("img_terrain_yama");
         this.imageCache[T.Wtr] = document.getElementById("img_terrain_kawa");
     }
-
-    endTurn(hGame) {
+	
+	endTurn(hGame) {
         this.unitList.forEach(unit => {
             if (
                 unit.appearTurn === hGame.turn &&

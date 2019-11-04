@@ -25,11 +25,18 @@ export default class PathFinder {
 			prev[x][y] := (gp) gp of parent node in the path tree.
 			dist[x][y] := (int) dist from startGP.
 			listPossibleDest := [] of reachable gp. NOTE: MIGHT HAVE OTHER UNITS
-			attackable[x][y] := (bool) whether that gp can be attacked by the unit.
-			listAttackable := [] of attackable gp. NOTE: MIGHT BE BLOCKED BY OTHER UNITS
+			attackable[x][y] := (int) whether that gp can be attacked by the unit.
+								-1 means not attackable.
+								the value is also the index of x,y @ listAttackable
+			listAttackable := [{gp, gpsFrom}]. ~.gpsFrom is [] of gps where you can
+								attack ~.gp. NOTE: THEY MIGHT BE BLOCKED BY OTHER UNITS
 		}
     */
-    floodFill(unit, startGP, searchRange, flagIgnoreUnit = false) {
+    floodFill(
+		unit, startGP, 
+		searchRange, 
+		flagIgnoreEnemyUnit = false
+	) {
         let prev = [];
         let dist = [];
 		let attackable = [];
@@ -40,7 +47,7 @@ export default class PathFinder {
             for (let j = 1; j <= this.maxGrid.y; j++) {
                 dist[i][j] = MAX_DIST;
                 prev[i][j] = null;
-                attackable[i][j] = false;
+                attackable[i][j] = -1;
             }
         }
 
@@ -55,7 +62,7 @@ export default class PathFinder {
 		let listAttackable = [];
 		
 		let dAttacks = dAtk[unit.attackRange];
-		this.addAttackable(dAttacks, attackable, listAttackable, startGP.x, startGP.y)
+		this.addAttackable(dAttacks, attackable, listAttackable, startGP);
 
         while (head > tail) {
             tail++;
@@ -71,13 +78,13 @@ export default class PathFinder {
                     dist[xNew][yNew] === MAX_DIST
                 ) {
                     let gpNew = { x: xNew, y: yNew };
-                    if (unit.checkPassable(gpNew, flagIgnoreUnit)) {
+                    if (unit.checkPassable(gpNew, flagIgnoreEnemyUnit)) {
                         head++;
                         queue[head] = gpNew;
                         dist[xNew][yNew] = dist[queue[tail].x][queue[tail].y] + 1;
                         prev[xNew][yNew] = queue[tail];
 						
-						this.addAttackable(dAttacks, attackable, listAttackable, xNew, yNew);
+						this.addAttackable(dAttacks, attackable, listAttackable, gpNew);
 						
                         listPossibleDest.push(gpNew);
                     }
@@ -149,17 +156,20 @@ export default class PathFinder {
 		return true;
 	}
 	
-	addAttackable(dAttacks, attackable, listAttackable, xOrigin, yOrigin)
+	addAttackable(dAttacks, attackable, listAttackable, gp)
 	{
 		dAttacks.forEach(dgp => {
-			//alert(dgp.x +","+ dgp.y +","+ xOrigin +","+  yOrigin)
-			if (this.checkIfGpInMaxGrid(xOrigin + dgp.x, yOrigin + dgp.y) &&
-				!attackable[xOrigin + dgp.x][yOrigin + dgp.y]
-			) {
-				attackable[xOrigin + dgp.x][yOrigin + dgp.y] = true;
-				listAttackable.push({
-					x : xOrigin + dgp.x, y : yOrigin + dgp.y
-				});
+			//alert(dgp.x +","+ dgp.y +","+ gp.x +","+  gp.y)
+			if (this.checkIfGpInMaxGrid(gp.x + dgp.x, gp.y + dgp.y)) {
+				if (attackable[gp.x + dgp.x][gp.y + dgp.y] === -1) {
+					attackable[gp.x + dgp.x][gp.y + dgp.y] = listAttackable.length;
+					listAttackable.push({
+						gp: {x : gp.x + dgp.x, y : gp.y + dgp.y},
+						gpsFrom: [gp]
+					});
+				} else {
+					listAttackable[attackable[gp.x + dgp.x][gp.y + dgp.y]].gpsFrom.push(gp);
+				}
 			}
 		});
 	}

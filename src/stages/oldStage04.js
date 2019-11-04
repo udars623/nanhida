@@ -30,7 +30,7 @@ let unitList = [
         gridPos: { x: 3, y: 7 },
         appearTurn: 0,
         isEnemy: false,
-		typeID: U.pKenshiJinlai,
+		typeID: U.pRizaruto,
 		params: {}
     },
     {

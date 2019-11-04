@@ -34,6 +34,13 @@ export default class Game {
 		this.unitCreator = new UnitCreator();
 		this.moveAssistList = new MoveAssistList(this);
 		this.skillCreator = new SkillCreator();
+		
+		this.flagUseCustomPlayerSkills = false;
+		this.customPlayerSkills = null;
+		this.mapSkillIDtoStr = [];
+		for (let x in consts.skills) {
+			this.mapSkillIDtoStr[consts.skills[x]] = x;
+		}
 	
 		this.buttonList = [];
 		this.makeButtons();
@@ -42,6 +49,7 @@ export default class Game {
     }
 	
 	resetGameState() {
+		this.currentStageIdxStr = null;
         this.playerUnitList = [];
         this.enemyUnitList = [];
         this.unitID = 0;
@@ -104,12 +112,30 @@ export default class Game {
 			this.unitID, this, gridPos, isEnemy, typeID, params
 		);
 		list.push(newUnit);
+		if (!isEnemy && this.flagUseCustomPlayerSkills) {
+			this.overridePlayerSkills(newUnit, list.length);
+		}
 		newUnit.initAfterCreation();
 		
 		if (flagConflict) this.resolveNewUnitConflict(newUnit);
 		
 		//alert("unit created with ID = " + this.unitID);
     }
+	
+	overridePlayerSkills(unit, idx) {
+		unit.params.skills = [];
+		this.customPlayerSkills[idx].forEach(skillID => {
+			if (parseInt(skillID) === consts.skills.none) {
+				//alert(skillID+" "+consts.skills.none);
+				return;
+			}
+			//alert(this.mapSkillIDtoStr[skillID]);
+			unit.params.skills.push({
+				skill: this.mapSkillIDtoStr[skillID],
+				level: 1
+			});
+		});
+	}
 	
 	resolveNewUnitConflict(unit) {
 		let pdir = this.pathFinder.floodFill(unit, unit.gridPos, 300, true);
@@ -123,6 +149,20 @@ export default class Game {
 		}
 		
 	}
+
+	changePlayerSkillsAndRestart(skills) {
+		this.customPlayerSkills = skills;
+		this.flagUseCustomPlayerSkills = true;
+		
+		if (this.currentStageIdxStr === null) this.startDefaultStage();
+		else this.start(this.currentStageIdxStr);
+	}
+	
+	usePresetSkillsAndRestart() {
+		this.flagUseCustomPlayerSkills = false;
+		if (this.currentStageIdxStr === null) this.startDefaultStage();
+		else this.start(this.currentStageIdxStr);
+	}
 	
 	startDefaultStage() {
 		this.start(this.stageList.defaultStageIdx);
@@ -132,8 +172,9 @@ export default class Game {
 		//alert("start")
 		this.resetGameState();
 		
+		this.currentStageIdxStr = stageIdxStr;
 		this.stageList.loadStage(stageIdxStr, this);
-				
+
         this.stage.initStage(this);
 		
         this.playerPhase();

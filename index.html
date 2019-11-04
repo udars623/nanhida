@@ -35,7 +35,19 @@
 				font-size: 14px;
 			}
 			
-			.active, .collapsible:hover {
+			.collapsible2 {
+				background-color: #777;
+				color: white;
+				cursor: pointer;
+				padding: 3px;
+				width: 200px;
+				border: none;
+				text-align: left;
+				outline: none;
+				font-size: 14px;
+			}
+			
+			.active, .collapsible, .collapsible2:hover {
 				background-color: #555;
 			}
 
@@ -44,6 +56,13 @@
 				display: none;
 				overflow: hidden;
 				background-color: #f1f1f1;
+			}
+			
+			.collapsedContent2 {
+				padding: 0 18px;
+				display: none;
+				overflow: hidden;
+				background-color: #e4e4e4;
 			}
 			
 			.hided {
@@ -89,6 +108,7 @@
         <button type="button" class="collapsible">Menu</button>
 		<div class="collapsedContent">
 			<div id="mapSelecter">map selecter here</div>
+			<div id="skillSelecter">skill selecter here</div>
 		</div>
 		<br />
 		<div class="noselect">
@@ -96,7 +116,7 @@
                 >@udars_feh</a
             >).
 			<br />
-			Version: 2019_1101f
+			Version: 2019_1103f
         </div>
 		
 		<script src="src/index.js"></script>

@@ -51,20 +51,18 @@ export default class StageList {
 	}
 	
 	getStageListStringForMapSelecter() {
-		let str = `
-		Map:
-		<select id="divSelecter_list">`;
+		let str = `Map:
+		<select id="divMapSelecter_list">`;
 		
 		let len = this.list.length;
 		for (let i = 0; i < len; i ++) {
 			str += `<option value="`+ i 
 			+ (i === this.defaultStageIdx ? `" selected` : `"`)
-			+`>` + this.list[i].nameStr + `</option>
-			`;
+			+`>` + this.list[i].nameStr + `</option>`;
 		}
 		
 		str += `</select>
-		<button id="divSelecter_confirm">Confirm</button>
+		<button id="divMapSelecter_confirm">Confirm</button>
 		<br />
 		`;
 		return str;

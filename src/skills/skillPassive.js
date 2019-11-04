@@ -6,6 +6,8 @@ export default class SkillPassive {
 		this.hUnit = unit;
 		this.level = level;
 		
+		this.isFighterSkill = false; // if true then only fighters can equip it
+		
 		this.isPassive = true; // important, decides when & how the skill is applied
 		// others are like isBuffEveryTurn, isMovementMutator etc. 
 		

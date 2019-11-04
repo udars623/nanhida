@@ -1,12 +1,14 @@
 import AbstractController from "/src/abstractController";
 import consts from "/src/consts";
 
+/* don't need this ugly stuff anymore since we have listAttackable[].gpsFrom now
 // remember to check 1~maxGrid when using this stuff
 let dAtk = [];
 dAtk[0] = [];
 dAtk[1] = [{x:0, y:+1}, {x:-1, y:0}, {x:+1, y:0}, {x:0, y:-1} ];
 dAtk[2] = [{x:0, y:+2}, {x:-1, y:+1}, {x:+1, y:+1}, {x:-2, y:0},
 			{x:+2, y:0}, {x:-1, y:-1}, {x:+1, y:-1}, {x:0, y:-2}];
+*/
 const MAX_DIST = 100000-1;
 
 let zoku = consts.zokusei;
@@ -35,6 +37,12 @@ export default class EnemyAI {
         this.blockFramePerMove = 18;
         this.blockFramePerWait = 10;
     }
+
+	executeEndTurn() {
+		this.absCon.clickButton(consts.buttons.TurnEnd);
+		this.absCon.clickButton(consts.buttons.TurnEnd);
+		this.blockFrameRemain = this.blockFramePerWait;
+	}
 
     executeWait(unit) {
         this.absCon.clickGP(unit.gridPos);
@@ -74,19 +82,15 @@ export default class EnemyAI {
 	}
 
 	findBestAttackPosition(su, target) {
-		let dAttacks = dAtk[su.attackRange];
-		
 		let minDist = MAX_DIST;
 		let bestGP = null;
-		dAttacks.forEach(dgp => {
-			if (this.checkIfGpInMaxGrid(target.gridPos.x + dgp.x, target.gridPos.y + dgp.y) &&
-				su.pathData.dist[target.gridPos.x + dgp.x][target.gridPos.y + dgp.y] < minDist
-			) {
-				let newGP = {x : target.gridPos.x+dgp.x,  y : target.gridPos.y+dgp.y};
-				let unit = this.hGame.findUnitByGridPos(newGP);
+		let idx = su.pathData.attackable[target.gridPos.x][target.gridPos.y];
+		su.pathData.listAttackable[idx].gpsFrom.forEach(gp => {
+			if (su.pathData.dist[gp.x][gp.y] < minDist) {
+				let unit = this.hGame.findUnitByGridPos(gp);
 				if (unit === null || unit.unitID === su.unitID) {
-					minDist = su.pathData.dist[target.gridPos.x + dgp.x][target.gridPos.y + dgp.y];
-					bestGP = newGP;
+					minDist = su.pathData.dist[gp.x][gp.y];
+					bestGP = gp;
 				}
 			}
 		});
@@ -100,9 +104,9 @@ export default class EnemyAI {
         let su = this.suList[suIdx];
 		let flagDone = false;
 		
-        su.pathData.listAttackable.forEach(gp => {
+        su.pathData.listAttackable.forEach(obj => {
 			if (flagDone) return;
-			let target = this.hGame.findOppoUnitByGridPos(this.isEnemy, gp);
+			let target = this.hGame.findOppoUnitByGridPos(this.isEnemy, obj.gp);
 			if (target !== null) {
 				//alert("found target");
 				let destGP = this.findBestAttackPosition(su, target);
@@ -114,7 +118,6 @@ export default class EnemyAI {
 					);
 					flagDone = true;
 					return; // you can't just return true here because it's inside a anonymous func
-						// and you can't assume fOUAA ends here because it's inside a forEach loop!
 						// the moral is: old for loop RULES
 				}
             }
@@ -163,7 +166,7 @@ export default class EnemyAI {
         let su = this.suList[suIdx];
         if (su.pathData.listPossibleDest.length === 0) return false;
 
-        let minDist = 10000;
+        let minDist = MAX_DIST;
         let bestGP = null;
 		let bestTarget = null;
 		let bestScore = null;
@@ -204,8 +207,10 @@ export default class EnemyAI {
         return false;
     }
 	
+	// behaviour: find su that has minimum dist to an ou.
+	// HOWEVER, if there is an su that can attack an ou from a proper gp, then that su will be chosen.
 	findClosestUnit() {
-		let minDist = 10000;
+		let minDist = MAX_DIST;
 		let closestUnitIdx = null;
 		
 		let len = this.suList.length;
@@ -213,7 +218,22 @@ export default class EnemyAI {
 			let su = this.suList[i];
 			if (!su.isActive()) continue;
 			this.ouList.forEach(ou => {
-				//let dist = Math.abs(su.gridPos.x - ou.gridPos.x) + Math.abs(su.gridPos.y - ou.gridPos.y);
+				if (su.pathData.attackable[ou.gridPos.x][ou.gridPos.y] !== -1) {
+					let gpsFrom = su.pathData.listAttackable[su.pathData.attackable[ou.gridPos.x][ou.gridPos.y]].gpsFrom;
+					let lenLA = gpsFrom.length;
+					for (let j = 0; j < lenLA; j ++) {
+						let target = this.hGame.findUnitByGridPos(gpsFrom[j]);
+						if (target === null) {
+							// this su can attack ou from gpsFrom[j]!!
+							// normally here you should find best attacker & best target
+							// but this is OHKO game so that's probably irrelevant (unless you do omakase)
+							minDist = -1;
+							closestUnitIdx = i;
+							return;
+						}
+					}
+				}
+				
 				let dist = this.suPDIR[i].dist[ou.gridPos.x][ou.gridPos.y];
 				//alert(su.unitID+" -> "+ou.unitID +" = "+ dist);
 				if (dist < minDist) {
@@ -247,12 +267,27 @@ export default class EnemyAI {
     makeOneMove() {
 		this.updatePDIR();
 		let suIdx = this.findClosestUnit();
+		if (suIdx === null) {
+			suIdx = this.findFirstActiveSu();
+		}
 		if (suIdx !== null) {
 			let res = this.findOppoUnitAndAttack(suIdx);
 			if (res === false) res = this.tryGetClose(suIdx);
 			if (res === false) this.executeWait(this.suList[suIdx]);
+		} else {
+			this.executeEndTurn();
 		}
     }
+	
+	findFirstActiveSu() {
+		let len = this.suList.length;
+		for (let i = 0; i < len; i ++) {
+			if (this.suList[i].isActive()) {
+				return i;
+			}
+		}
+		return null;
+	}
 
     update(df) {
         this.blockFrameRemain -= df;

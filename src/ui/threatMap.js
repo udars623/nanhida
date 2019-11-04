@@ -47,8 +47,8 @@ export default class ThreatMap {
 			}
 		}
 		this.hGame.enemyUnitList.forEach(unit => {
-			unit.pathData.listAttackable.forEach(gp => {
-				this.threatMap[gp.x][gp.y] = true;
+			unit.pathData.listAttackable.forEach(obj => {
+				this.threatMap[obj.gp.x][obj.gp.y] = true;
 			});
 		});
 	}

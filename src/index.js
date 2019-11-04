@@ -1,6 +1,7 @@
 import InputHandler from "/src/inputHandler";
 import Game from "/src/game";
-import MapSelecter from "/src/mapSelecter";
+import MapSelecter from "/src/ui/mapSelecter";
+import SkillSelecter from "/src/ui/skillSelecter";
 import consts from "/src/consts";
 
 let canvas = document.getElementById("gameScreen");
@@ -11,13 +12,12 @@ const GAME_HEIGHT = 640;
 const DRAW_WIDTH = 430;
 const DRAW_HEIGHT = 640;
 
-//let paddle = new Paddle(GAME_WIDTH, GAME_HEIGHT);
-
 let game = new Game(GAME_WIDTH, GAME_HEIGHT, canvas);
 let playerInputHandler = new InputHandler(game);
 game.bindPlayerInputHandler(playerInputHandler);
 
 let mapSelecter = new MapSelecter(game);
+let skillSelecter = new SkillSelecter(game);
 
 game.startDefaultStage();
 
@@ -34,9 +34,9 @@ function gameLoop(timestamp) {
 	requestAnimationFrame(gameLoop);
 }
 
-function scriptCollapsibles() {
+function scriptCollapsibles(strClass) {
 	// https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_collapsible
-	let collapsibles = document.getElementsByClassName("collapsible");
+	let collapsibles = document.getElementsByClassName(strClass);
 	for (let i = 0; i < collapsibles.length; i++) {
 		collapsibles[i].addEventListener("click", function() {
 			this.classList.toggle("active");
@@ -50,6 +50,7 @@ function scriptCollapsibles() {
 	}
 }
 
-scriptCollapsibles() ;
+scriptCollapsibles("collapsible") ;
+scriptCollapsibles("collapsible2") ;
 
 requestAnimationFrame(gameLoop);

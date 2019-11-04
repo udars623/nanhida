@@ -16,6 +16,7 @@ export default class ProtoEnemy extends UnitBase {
 		this.params = JSON.parse(JSON.stringify(params));
 		if (this.params.skills === undefined) this.params.skills = [];
 		this.barrierTimer = this.hGame.barrierConnectionTimer;
+		this.isFighter = true; // decides whether this unit can equip fighter skills
 		//this.initBarrier();   <-- moved to update()
 	}
 	

@@ -2,12 +2,11 @@ const texts = {
 	unit: {
 		unitBase: "nannhidaman",
 		
-		pKenshi: "剣士",
-		
+		pRizaruto: "リザルト・ヴォン・ヒ～ダン",		
 		pTomato: "トマト・ジューシー",
 		pBlueberry: "ブルーベリー・タイニー",
 		pCabbage: "キャベツ・レタス・ドッチナン",
-		pKenshiJinlai: "リザルト・ヴォン・ヒ～ダン",
+		pKenshi: "剣士",
 		
 		eKenshi: "剣士",
 		eArcher: "弓兵",
@@ -24,6 +23,9 @@ const texts = {
 	skills: {
 		none: "--",
 		extraStamina: "行動力強化",
+		extraMovement: "移動距離強化",
+		passiveFlyer: "飛行",
+		passiveRanged: "遠距離攻撃",
 	},
 }
 

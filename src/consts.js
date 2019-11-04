@@ -25,11 +25,11 @@ const consts = {
 	unitTypes: {
 		unitBase: 0,
 		
-		pKenshi: 1,
+		pRizaruto: 1,
 		pTomato: 2,
 		pBlueberry: 3,
 		pCabbage: 4,
-		pKenshiJinlai: 5,
+		pKenshi: 5,
 		
 		eKenshi: 11,
 		eArcher: 12,
@@ -51,9 +51,16 @@ const consts = {
 	skills: {
 		none: 0,
 		extraStamina: 1,
+		extraMovement: 2,
+		passiveFlyer: 3,
+		passiveRanged: 4,
 	},
 	settings: {
 		showUnitID: true,
+	},
+	game: {
+		maxPlayerUnitNumber : 4,
+		maxSkillNumber : 5,
 	}
 };
 export default consts;

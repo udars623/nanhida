@@ -38,8 +38,8 @@ export default class UnitBase {
 					skillLevelPair.skill,
 					skillLevelPair.level,
 				);
+				if (newSkill.isFighterSkill === true && this.isFighter === false) return;
 				this.skillList.push(newSkill);
-				
 			});
 		}
 	}
@@ -298,9 +298,9 @@ export default class UnitBase {
 	drawThreat(ctx) {
 		if (this.isSelected) {
 			ctx.fillStyle = "rgba(255,238,238,0.8)";
-			this.pathData.listAttackable.forEach(gp => {
-				if (!this.hGame.pathFinder.isReachable(this.pathData, gp)) {
-					let pos = this.hGame.gridPosToPos(gp);
+			this.pathData.listAttackable.forEach(obj => {
+				if (!this.hGame.pathFinder.isReachable(this.pathData, obj.gp)) {
+					let pos = this.hGame.gridPosToPos(obj.gp);
 					ctx.fillRect(
 						pos.x - this.imageSize.x * 0.45,
 						pos.y - this.imageSize.y * 0.45,

@@ -1,7 +1,7 @@
 import consts from "/src/consts"
 import UnitBase from "/src/unitBase";
 import PKenshi from "/src/units/pKenshi";
-import PKenshiJinlai from "/src/units/pKenshiJinlai";
+import PRizaruto from "/src/units/pRizaruto";
 import PTomato from "/src/units/pTomato";
 import PBlueberry from "/src/units/pBlueberry";
 import PCabbage from "/src/units/pCabbage";
@@ -25,7 +25,7 @@ export default class UnitCreator {
 		
 		this.list[uType.unitBase] = UnitBase;
 		this.list[uType.pKenshi] = PKenshi;
-		this.list[uType.pKenshiJinlai] = PKenshiJinlai;
+		this.list[uType.pRizaruto] = PRizaruto;
 		this.list[uType.pTomato] = PTomato;
 		this.list[uType.pBlueberry] = PBlueberry;
 		this.list[uType.pCabbage] = PCabbage;

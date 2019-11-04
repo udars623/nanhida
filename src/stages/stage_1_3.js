@@ -23,7 +23,7 @@ let unitList = [
         gridPos: { x: 2, y: 6 },
         appearTurn: 0,
         isEnemy: false,
-		typeID: U.pKenshiJinlai,
+		typeID: U.pRizaruto,
 		params: {
 			zokusei: consts.zokusei.none
 		}

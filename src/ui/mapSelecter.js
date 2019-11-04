@@ -3,10 +3,10 @@ export default class MapSelecter {
 		let divSelecter = document.getElementById("mapSelecter");
 		divSelecter.innerHTML = hGame.stageList.getStageListStringForMapSelecter();
 		
-		let button = document.getElementById("divSelecter_confirm");
+		let button = document.getElementById("divMapSelecter_confirm");
 		button.addEventListener("click", event => {
-			var e = document.getElementById("divSelecter_list");
-			var result = e.options[e.selectedIndex].value;
+			let e = document.getElementById("divMapSelecter_list");
+			let result = e.options[e.selectedIndex].value;
 			//alert("confirmed " + result);
 			hGame.start(result);
 		});
