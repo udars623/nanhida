@@ -1,4 +1,5 @@
 import consts from "/src/consts";
+import texts from "/src/texts/texts_jp";
 
 let terrainTypes = consts.terrainTypes;
 
@@ -9,6 +10,7 @@ export default class UnitBase {
         this.gridPos = gridPos;
 
 		this.nameStr = "nannhidaman";
+		this.nameStrDisp = this.nameStr;
 		this.imageID = "img_kenshi";
         this.imageSize = {
             x: hGame.gridSize,
@@ -79,8 +81,9 @@ export default class UnitBase {
 		this.resetProposal();
 		
 		if (consts.settings.showUnitID === true) {
-			this.nameStr = this.nameStr + " (" + this.unitID + ")";
+			this.nameStr = "(" + this.unitID + ") " + this.nameStr;
 		}
+		this.updateNameStrDisp();
 	}
 
     resetControlState() {
@@ -109,9 +112,18 @@ export default class UnitBase {
 		return (this.hp > 0);
 	}
 
+	updateNameStrDisp() {
+		if (this.isEnemy) {
+			this.nameStrDisp = this.nameStr;
+		} else {
+			this.nameStrDisp = this.nameStr + " [" + texts.ui.actionsLeft + this.stamina + "]";
+		}
+	}
+
     eventNewTurn() {
         // reset stamina
         this.stamina = this.staminaMax;
+		this.updateNameStrDisp();
 
         // reset buffs & debuffs?
         this.moveDist = this.moveDistMax;
@@ -210,6 +222,7 @@ export default class UnitBase {
 
     executeAction() {
         this.stamina--;
+		this.updateNameStrDisp();
         this.resetProposal();
         this.hGame.eventActionExecuted();
     }

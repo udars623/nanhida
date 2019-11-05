@@ -42,6 +42,11 @@ export default class Game {
 			this.mapSkillIDtoStr[consts.skills[x]] = x;
 		}
 	
+		this.localSettings = { // does not reset in resetGameState()
+			flagDrawAllBarrier : false,
+			flagDrawThreat : false,
+		}
+	
 		this.buttonList = [];
 		this.makeButtons();
 		
@@ -71,7 +76,6 @@ export default class Game {
 		this.threatMap = new ThreatMap(this);
 		this.statusPanel = new StatusPanel(this);
 		
-		this.flagDrawAllBarrier = false;
 		this.flagUnitSelected = false;
 		this.barrierConnectionTimer = new GeneralTimer(this, 0.04, 3);
 		this.timerList.push(this.barrierConnectionTimer);
@@ -193,11 +197,12 @@ export default class Game {
 	}
 	
 	toggleThreat() {
+		this.localSettings.flagDrawThreat = !this.localSettings.flagDrawThreat;
 		this.threatMap.toggleThreat();
 	}
 	
 	toggleBarrier() {
-		this.flagDrawAllBarrier = !this.flagDrawAllBarrier;
+		this.localSettings.flagDrawAllBarrier = !this.localSettings.flagDrawAllBarrier;
 		this.barrierConnectionTimer.resetTimer();
 	}
 

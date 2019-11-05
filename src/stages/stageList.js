@@ -15,6 +15,8 @@ import Stage0103 from "/src/stages/stage_1_3_easy";
 import Stage0104 from "/src/stages/stage_1_4";
 import Stage0105 from "/src/stages/stage_1_5";
 import Abysmal from "/src/stages/abysmal";
+import AbysmalChaseTest from "/src/stages/abysmal_chase_test";
+
 
 /*
 	When adding a new stage:
@@ -42,8 +44,9 @@ export default class StageList {
 		
 		this.list.push(OldStage04);
 		this.list.push(Abysmal);
-		this.list.push(StageTestBarrier);
-		this.list.push(StageTestReinforcement);
+		//this.list.push(StageTestBarrier);
+		//this.list.push(StageTestReinforcement);
+		//this.list.push(AbysmalChaseTest);
 	}
 	
 	loadStage(idxStr, hGame) {

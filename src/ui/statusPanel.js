@@ -43,7 +43,7 @@ export default class StatusPanel {
 			ctx.fillStyle = "#000";
 			ctx.font = "18px serif";
 			ctx.fillText(
-				this.currentUnit.nameStr,
+				this.currentUnit.nameStrDisp,
 				this.hGame.gridSize * 2.3,
 				this.hGame.gridSize * (this.hGame.maxGrid.y+0.6)
 			);

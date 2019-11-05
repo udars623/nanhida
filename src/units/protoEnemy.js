@@ -85,9 +85,9 @@ export default class ProtoEnemy extends UnitBase {
 	drawBarrierConnection(ctx) {
 		if (this.barrierTotal <= 0) return;
 		if (this.isInPhase()) return;
-		if (this.hGame.flagDrawAllBarrier === false &&
+		if (this.hGame.localSettings.flagDrawAllBarrier === false &&
 			this.isSelected === false) return;
-		if (this.hGame.flagDrawAllBarrier && 
+		if (this.hGame.localSettings.flagDrawAllBarrier && 
 			this.hGame.flagUnitSelected &&
 			this.isSelected === false) return;
 		

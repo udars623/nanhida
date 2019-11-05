@@ -2,10 +2,10 @@ const texts = {
 	unit: {
 		unitBase: "nannhidaman",
 		
-		pRizaruto: "リザルト・ヴォン・ヒ～ダン",		
-		pTomato: "トマト・ジューシー",
-		pBlueberry: "ブルーベリー・タイニー",
-		pCabbage: "キャベツ・レタス・ドッチナン",
+		pRizaruto: "リザルト",		
+		pTomato: "トマト",
+		pBlueberry: "ブルーベリー",
+		pCabbage: "キャベツ",
 		pKenshi: "剣士",
 		
 		eKenshi: "剣士",
@@ -27,6 +27,9 @@ const texts = {
 		passiveFlyer: "飛行",
 		passiveRanged: "遠距離攻撃",
 	},
+	ui: {
+		actionsLeft: "行動",
+	}
 }
 
 

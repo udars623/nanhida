@@ -6,7 +6,7 @@ export default class ThreatMap {
 		this.hGame = hGame;
 		this.maxGrid = hGame.maxGrid;
 		
-		this.flagShowThreat = false;
+		this.flagShowThreat = hGame.localSettings.flagDrawThreat;
 		
 		this.threatMap = [];
 		for (let x = 1; x <= this.maxGrid.x; x++) {

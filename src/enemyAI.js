@@ -152,6 +152,7 @@ export default class EnemyAI {
 		let score = 0;
 		let len = this.ouList.length;
 		for (let i = 0; i < len; i ++) {
+			if (this.ouList[i] === target) continue;
 			let z = this.compareZokusei(su, this.ouList[i]);
 			score += 100 * this.ouPDIR[i].dist[gp.x][gp.y] * (-z);
 		}
@@ -159,6 +160,7 @@ export default class EnemyAI {
 			Math.abs(target.gridPos.x - gp.x) - 
 			Math.abs(target.gridPos.y - gp.y)
 		);
+		//alert(su.unitID + " vs " + target.unitID + " @ (" + gp.x +","+ gp.y +") = " + score);
 		return score;
 	}
 
