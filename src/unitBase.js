@@ -374,7 +374,7 @@ export default class UnitBase {
 		if (this.isAlive()) {
 			if (this.hasDestProposal) {
 				ctx.drawImage(
-					this.image,
+					this.imageZokusei,
 					this.destProposalCoord.x -
 						(this.imageSize.x * this.drawScale) / 2,
 					this.destProposalCoord.y -
@@ -383,7 +383,7 @@ export default class UnitBase {
 					this.imageSize.y * this.drawScale
 				);
 				ctx.drawImage(
-					this.imageZokusei,
+					this.image,
 					this.destProposalCoord.x -
 						(this.imageSize.x * this.drawScale) / 2,
 					this.destProposalCoord.y -
@@ -393,14 +393,14 @@ export default class UnitBase {
 				);
 			} else {
 				ctx.drawImage(
-					this.image,
+					this.imageZokusei,
 					this.coordinate.x - (this.imageSize.x * this.drawScale) / 2,
 					this.coordinate.y - (this.imageSize.y * this.drawScale) / 2,
 					this.imageSize.x * this.drawScale,
 					this.imageSize.y * this.drawScale
 				);
 				ctx.drawImage(
-					this.imageZokusei,
+					this.image,
 					this.coordinate.x - (this.imageSize.x * this.drawScale) / 2,
 					this.coordinate.y - (this.imageSize.y * this.drawScale) / 2,
 					this.imageSize.x * this.drawScale,

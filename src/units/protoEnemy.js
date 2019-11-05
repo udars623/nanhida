@@ -26,10 +26,10 @@ export default class ProtoEnemy extends UnitBase {
 		if (this.params.barrier === undefined) this.params.barrier = null;
 		if (this.params.barrier !== null) {
 			this.params.barrier.forEach(id => {
+				let unitSource = this.hGame.findUnitByID(this.isEnemy, id);
+				if (unitSource === null) return; // source already dead
 				this.barrierTotal ++;
-				this.barrierSourceList.push(
-					this.hGame.findUnitByID(this.isEnemy, id)
-				);
+				this.barrierSourceList.push(unitSource);
 			});
 		}
 		

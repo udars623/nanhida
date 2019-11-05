@@ -330,10 +330,12 @@ export default class Game {
 
 	findUnitByID(isEnemy, id) {
 		//alert(id);
-		let unit = this.enemyUnitList.find(function (unit) {return unit.unitID === id;});
+		let unit = isEnemy ? this.enemyUnitList.find(function (unit) {return unit.unitID === id;})
+			: this.playerUnitList.find(function (unit) {return unit.unitID === id;});;
 		//let unit = null;
 		//this.enemyUnitList.forEach(u => {if (u.unitID === id) unit = u;})
 		//alert(unit);
+		if (unit === undefined) return null;
 		return unit;
 		//if (isEnemy) return ;
 		//else return this.playerUnitList.find(unit => unit.unitID === id);
